@@ -1,0 +1,67 @@
+import { useLiveQuery } from 'dexie-react-hooks'
+import { db } from './db'
+import {
+  listActiveTasksGrouped,
+  listProjects,
+  listSectionsWithTasks,
+  projectColorMap,
+} from './projects'
+import {
+  getCurrentSession,
+  getRealTimeByTask,
+  getRunningSegment,
+  getSessionView,
+  listHistory,
+} from './sessions'
+import type { Day, Timestamp } from './types'
+
+// Hooks de lecture : se mettent à jour seuls quand la base change.
+// `undefined` = chargement en cours.
+
+export function useProjects() {
+  return useLiveQuery(listProjects)
+}
+
+export function useProject(id: string | undefined) {
+  return useLiveQuery(async () => {
+    if (!id) return null
+    const all = await db.projects.toArray()
+    const project = all.find((p) => p.id === id)
+    if (!project) return null
+    return { project, color: projectColorMap(all).get(id)! }
+  }, [id])
+}
+
+export function useSectionsWithTasks(projectId: string | undefined) {
+  return useLiveQuery(async () => (projectId ? listSectionsWithTasks(projectId) : []), [projectId])
+}
+
+export function useActiveTasksGrouped() {
+  return useLiveQuery(listActiveTasksGrouped)
+}
+
+// ---------- Sessions et temps réel (4.1) ----------
+// `now` change chaque seconde quand un chrono tourne : la requête est relancée.
+
+export function useCurrentSession() {
+  return useLiveQuery(getCurrentSession)
+}
+
+export function useRunningSegment() {
+  return useLiveQuery(getRunningSegment)
+}
+
+export function useSessionView(sessionId: string | undefined, now: Timestamp) {
+  return useLiveQuery(
+    async () => (sessionId ? getSessionView(sessionId, now) : null),
+    [sessionId, now],
+  )
+}
+
+export function useHistory(now: Timestamp) {
+  return useLiveQuery(() => listHistory(now), [now])
+}
+
+export function useRealTimeByTask(days: readonly Day[], now: Timestamp) {
+  return useLiveQuery(() => getRealTimeByTask(days, now), [days.join(','), now])
+}

@@ -1,6 +1,6 @@
 # Suivi — Adele / Suivi de travail piano
 
-Statuts : `À faire` · `En cours` · `Bloqué` · `Fait`. Seul le PO passe un ticket en `Fait`.
+Statuts : `À faire` · `En cours` · `Bloqué` · `À vérifier` (fini par CC, en attente de la vérification de fin d'epic) · `Fait`. Seul le PO passe un ticket en `Fait`.
 Qui : PO · CC (Claude Code) · Adele
 
 Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 → 2.5, 4.1 → 2.6, 3.1 → 3.4, 4.2 → 4.6, 5.1 → 5.2, 6.2 → 6.5 (6.1 en parallèle), 7.1 → 7.3. 4.1 passe avant 3.1 : l’onglet Semaine affiche le temps réel.
@@ -19,12 +19,12 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 ## Epic 2 — Projets, sections et tâches (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
-| 2.1 | Fonctions données projets / sections / tâches | Donnée | CC | 1.4 | À faire |
-| 2.2 | Liste et création / édition de projet | Front | CC | 1.5, 2.1, lot 1 | À faire |
-| 2.3 | Détail projet : sections, tâches, avancement | Front | CC | 2.2 | À faire |
-| 2.4 | Supprimer un projet avec confirmation | Front | CC | 2.3 | À faire |
-| 2.5 | Archiver et réactiver des tâches | Front | CC | 2.3 | À faire |
-| 2.6 | Revue de semaine | Front | CC | 2.5, 4.1 | À faire |
+| 2.1 | Fonctions données projets / sections / tâches | Donnée | CC | 1.4 | Fait |
+| 2.2 | Liste et création / édition de projet | Front | CC | 1.5, 2.1, lot 1 | Fait |
+| 2.3 | Détail projet : sections, tâches, avancement | Front | CC | 2.2 | Fait |
+| 2.4 | Supprimer un projet avec confirmation | Front | CC | 2.3 | Fait |
+| 2.5 | Archiver et réactiver des tâches | Front | CC | 2.3 | Fait |
+| 2.6 | Revue de semaine | Front | CC | 2.5, 4.1 | Fait |
 
 ## Epic 3 — Semaine et temps prévu (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
@@ -37,7 +37,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 ## Epic 4 — Sessions (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
-| 4.1 | Moteur de session et de chrono | Donnée | CC | 1.4, 2.1 | À faire |
+| 4.1 | Moteur de session et de chrono | Donnée | CC | 1.4, 2.1 | Fait |
 | 4.2 | Démarrer une session, choisir ses tâches | Front | CC | 3.4, 4.1, lot 1 | À faire |
 | 4.3 | Session en cours : chronos, pause, fin | Front | CC | 4.2 | À faire |
 | 4.4 | Bandeau de chrono global | Front | CC | 4.3 | À faire |
@@ -81,7 +81,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 ## Lots après MVP
 | Lot | Branche | Contenu | Qui | Statut | Non commité |
 |---|---|---|---|---|---|
-| Lot 1 | `lot-1-tokens-et-en-tete-du-proto` | Reprise de 1.5 / 1.7 d'après le proto : tokens renommés et complétés comme le proto (`screen`, `felt`, `felt-soft`, `key`, `scrim`, `c0`–`c5`, `over`, `over-soft`, `danger`, clair et sombre — valeurs dans CLAUDE.md) ; en-tête d'écran avec sous-titre et bouton retour sur les sous-écrans ; feuille modale en bas d'écran et message bref (toast) réutilisables. Préalable aux tickets Front des epics 2 à 7. | CC | À faire | — |
+| Lot 1 | `lot-1-tokens-et-en-tete-du-proto` | Reprise de 1.5 / 1.7 d'après le proto : tokens renommés et complétés comme le proto (`screen`, `felt`, `felt-soft`, `key`, `scrim`, `c0`–`c5`, `over`, `over-soft`, `danger`, clair et sombre — valeurs dans CLAUDE.md) ; en-tête d'écran avec sous-titre et bouton retour sur les sous-écrans ; feuille modale en bas d'écran et message bref (toast) réutilisables. Préalable aux tickets Front des epics 2 à 7. | CC | Fait | — |
 
 ## Hypothèses à vérifier
 | # | Hypothèse | Quand | Résultat |
@@ -127,3 +127,4 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | 07/11/2026 | Bouton « Supprimer » en rouge brique `danger` (action destructive, distinct du rouge `over`) | Choix PO | 2.3, 2.4 |
 | 07/11/2026 | Ajout manuel : jour choisi parmi les 14 derniers jours | Choix PO | 4.6 |
 | 07/11/2026 | Téléphone cible : Android, écran de 360 à 412 px de large (Adele : Redmi Note 9 ou Honor, modèle exact inconnu ; PO : Nothing Phone 3). Installation validée sur le téléphone d'Adele (1.6) | Info PO | Tous les écrans |
+| 07/11/2026 | Epic par epic : CC enchaîne tous les tickets d'une epic sans validation par ticket (statut `À vérifier`), le PO vérifie en fin d'epic avant le merge dans `main` | Choix PO | Workflow, à partir de l'epic 2 |

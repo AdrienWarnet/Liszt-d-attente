@@ -62,3 +62,8 @@ export function formatDayLabel(day: Day): string {
 export function formatWeekLabel(start: WeekStart): string {
   return `${labels.weekOf} ${dayMonthFormat.format(parseDay(start))}`
 }
+
+/** Ex. « 3 nov. » */
+export function formatDayMonth(day: Day): string {
+  return dayMonthFormat.format(parseDay(day))
+}

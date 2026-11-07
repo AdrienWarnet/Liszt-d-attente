@@ -1,4 +1,7 @@
 // Tous les textes affichés de l'app. Aucun libellé en dur dans les composants.
+
+const plural = (n: number, one: string, many: string) => (n > 1 ? many : one)
+
 export const labels = {
   appName: 'Piano',
   appFullName: 'Piano — suivi de travail',
@@ -17,9 +20,70 @@ export const labels = {
   },
   mainNavigation: 'Navigation principale',
 
+  common: {
+    back: 'Retour',
+    close: 'Fermer',
+    cancel: 'Annuler',
+    save: 'Enregistrer',
+  },
+
   more: {
     backup: 'Sauvegarde',
     about: 'À propos',
     version: 'Version',
+  },
+
+  projects: {
+    newProject: '+ Nouveau projet',
+    newTitle: 'Nouveau projet',
+    editTitle: 'Modifier le projet',
+    name: 'Nom',
+    namePlaceholder: 'Un morceau, le déchiffrage…',
+    startDate: 'Date de début (facultative)',
+    endDate: 'Date de fin (facultative)',
+    empty: 'Aucun projet. Crée ton premier projet (un morceau, le déchiffrage…).',
+    since: (date: string) => `depuis le ${date}`,
+    sinceTitle: (date: string) => `Depuis le ${date}`,
+    until: (date: string) => `jusqu'au ${date}`,
+    noStart: 'Sans date de début',
+    activeTasks: (n: number) => `${n} ${plural(n, 'tâche active', 'tâches actives')}`,
+    notFound: 'Ce projet n’existe pas ou a été supprimé.',
+    // Détail
+    edit: 'Modifier',
+    planning: 'Planning',
+    report: 'Bilan du projet',
+    delete: 'Supprimer',
+    deleteTitle: (name: string) => `Supprimer « ${name} » ?`,
+    deleteText:
+      'Le projet, ses sections et ses tâches disparaîtront de tes listes. Le temps déjà passé reste compté dans tes bilans.',
+    deleted: 'Projet supprimé',
+    noSection: 'Commence par créer une section, puis ajoute ses tâches.',
+    progressPlaceholder: 'Avancement : où en est cette section ?',
+    progressLabel: (section: string) => `Avancement de ${section}`,
+    addTask: '+ Ajouter une tâche',
+    addTaskLabel: (section: string) => `Ajouter une tâche à ${section}`,
+    newSection: '+ Nouvelle section',
+    editTask: (label: string) => `Modifier la tâche ${label}`,
+    // Archivage
+    archive: 'Archiver',
+    reactivate: 'Réactiver',
+    archivedTasks: (n: number) => `Tâches archivées (${n})`,
+    taskArchived: 'Tâche archivée',
+    taskReactivated: 'Tâche réactivée',
+    reviewLink: 'Revue de semaine',
+  },
+
+  review: {
+    title: 'Revue de semaine',
+    subtitle: 'Archive, ajoute, mets à jour l’avancement',
+    hint: 'À droite : temps réel de la semaine.',
+    archiveSelection: (n: number) => `Archiver la sélection (${n})`,
+    archived: (n: number) => `${n} ${plural(n, 'tâche archivée', 'tâches archivées')}`,
+    empty: 'Aucun projet pour l’instant.',
+  },
+
+  errors: {
+    nameRequired: 'Donne un nom au projet.',
+    endBeforeStart: 'La date de fin doit être après la date de début.',
   },
 } as const
