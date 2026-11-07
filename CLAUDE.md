@@ -35,6 +35,7 @@ Avant chaque ticket, lire : ce fichier, `docs/brief.md` (règles métier R1–R2
 - IDs = `crypto.randomUUID()`.
 - Chrono : temps **toujours calculé** depuis les horodatages (`(endedAt ?? Date.now()) - startedAt`), jamais par un compteur incrémenté (les timers sont suspendus écran verrouillé). Le `setInterval` d'affichage ne sert qu'à rafraîchir l'écran.
 - Archivage et suppression de projet ne suppriment **jamais** le temps passé (suppression logique).
+- Une section ou une tâche ne peut être supprimée (vraie suppression) que si aucun temps n'y est enregistré (lot 3) ; sinon on l'archive.
 - Toute écriture multi-tables passe par `db.transaction('rw', ...)`.
 
 ## Modèle de données (Dexie, version 1)

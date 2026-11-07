@@ -73,6 +73,18 @@ export const labels = {
     taskArchived: 'Tâche archivée',
     taskReactivated: 'Tâche réactivée',
     reviewLink: 'Revue de semaine',
+    // Suppression sans temps (lot 3)
+    deleteTask: (label: string) => `Supprimer la tâche ${label}`,
+    taskDeleted: 'Tâche supprimée',
+    taskHasTime: 'Cette tâche a du temps enregistré : archive-la plutôt.',
+    deleteSection: (name: string) => `Supprimer la section ${name}`,
+    deleteSectionTitle: (name: string) => `Supprimer « ${name} » ?`,
+    deleteSectionText: (n: number) =>
+      n > 0
+        ? `La section et ${plural(n, 'sa tâche', `ses ${n} tâches`)} seront supprimées.`
+        : 'La section sera supprimée.',
+    sectionHasTime: 'Une tâche de cette section a du temps enregistré : archive ses tâches plutôt.',
+    sectionDeleted: 'Section supprimée',
   },
 
   review: {
