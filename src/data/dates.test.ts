@@ -4,6 +4,9 @@ import {
   addWeeks,
   formatDayLabel,
   formatDayMonth,
+  formatDayShort,
+  formatDayTitle,
+  formatWeekdayShort,
   formatWeekLabel,
   parseDay,
   toDay,
@@ -121,6 +124,12 @@ describe('libellés', () => {
   it('formatDayLabel', () => {
     expect(formatDayLabel('2026-11-09')).toBe('lun. 9 nov.')
     expect(formatDayLabel('2026-11-15')).toBe('dim. 15 nov.')
+  })
+
+  it('formatDayShort, formatWeekdayShort, formatDayTitle', () => {
+    expect(formatDayShort('2026-11-09')).toBe('lun. 9')
+    expect(formatWeekdayShort('2026-11-15')).toBe('dim')
+    expect(formatDayTitle('2026-11-09')).toBe('Lundi 9 nov.')
   })
 
   it('formatDayMonth', () => {

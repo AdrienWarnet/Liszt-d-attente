@@ -13,7 +13,8 @@ import {
   getSessionView,
   listHistory,
 } from './sessions'
-import type { Day, Timestamp } from './types'
+import type { Day, Timestamp, WeekStart } from './types'
+import { getDayOverview, getDayPlan, getWeekOverview } from './week'
 
 // Hooks de lecture : se mettent à jour seuls quand la base change.
 // `undefined` = chargement en cours.
@@ -64,4 +65,18 @@ export function useHistory(now: Timestamp) {
 
 export function useRealTimeByTask(days: readonly Day[], now: Timestamp) {
   return useLiveQuery(() => getRealTimeByTask(days, now), [days.join(','), now])
+}
+
+// ---------- Semaine et temps prévu (3.1) ----------
+
+export function useWeekOverview(weekStart: WeekStart, now: Timestamp) {
+  return useLiveQuery(() => getWeekOverview(weekStart, now), [weekStart, now])
+}
+
+export function useDayOverview(day: Day, now: Timestamp) {
+  return useLiveQuery(() => getDayOverview(day, now), [day, now])
+}
+
+export function useDayPlan(day: Day) {
+  return useLiveQuery(() => getDayPlan(day), [day])
 }
