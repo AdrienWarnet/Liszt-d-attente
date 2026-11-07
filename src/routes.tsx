@@ -1,6 +1,6 @@
 import { Navigate, type RouteObject } from 'react-router'
 import { Layout } from './components/Layout'
-import { BackupScreen } from './screens/EmptyScreens'
+import { BackupScreen } from './screens/BackupScreen'
 import { DayScreen } from './screens/DayScreen'
 import { HistoryScreen } from './screens/HistoryScreen'
 import { ManualEntryScreen } from './screens/ManualEntryScreen'

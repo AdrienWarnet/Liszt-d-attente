@@ -289,6 +289,30 @@ export const labels = {
     single: (week: string) => `sem. du ${week}`,
   },
 
+  backup: {
+    intro:
+      'Tes données sont uniquement sur ce téléphone. Fais une sauvegarde régulièrement et garde le fichier ailleurs (mail, Drive).',
+    last: 'Dernière sauvegarde',
+    never: 'Jamais',
+    ago: (days: number) =>
+      days <= 0 ? 'aujourd’hui' : days === 1 ? 'hier' : `il y a ${days} jours`,
+    export: 'Exporter une sauvegarde',
+    exported: 'Sauvegarde exportée',
+    restore: 'Restaurer une sauvegarde',
+    restoreTitle: 'Restaurer une sauvegarde',
+    chosenFile: (name: string) => `Fichier choisi : ${name}`,
+    summary: (projects: number, tasks: number, sessions: number, date: string) =>
+      `${projects} ${plural(projects, 'projet', 'projets')}, ${tasks} ${plural(tasks, 'tâche', 'tâches')}, ${sessions} ${plural(sessions, 'session', 'sessions')} — exporté le ${date}`,
+    warning: 'Ceci remplace toutes les données actuelles de l’app.',
+    confirm: 'Restaurer',
+    restored: 'Sauvegarde restaurée',
+    notBackup: 'Ce fichier n’est pas une sauvegarde de Liszt d’attente.',
+    newerVersion:
+      'Cette sauvegarde vient d’une version plus récente de l’app : mets l’app à jour puis réessaie.',
+    reminder: 'Pas de sauvegarde depuis plus de 7 jours',
+    fileInput: 'Choisir le fichier de sauvegarde',
+  },
+
   errors: {
     nameRequired: 'Donne un nom au projet.',
     endBeforeStart: 'La date de fin doit être après la date de début.',
