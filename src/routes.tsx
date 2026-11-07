@@ -5,6 +5,7 @@ import { DayScreen } from './screens/DayScreen'
 import { HistoryScreen } from './screens/HistoryScreen'
 import { ManualEntryScreen } from './screens/ManualEntryScreen'
 import { MoreScreen } from './screens/MoreScreen'
+import { PlanningScreen } from './screens/PlanningScreen'
 import { ProjectDetailScreen } from './screens/ProjectDetailScreen'
 import { ProjectsScreen } from './screens/ProjectsScreen'
 import { ReviewScreen } from './screens/ReviewScreen'
@@ -20,6 +21,7 @@ export const routes: RouteObject[] = [
       { path: 'semaine/jour/:day', element: <DayScreen /> },
       { path: 'projets', element: <ProjectsScreen /> },
       { path: 'projets/:id', element: <ProjectDetailScreen /> },
+      { path: 'projets/:id/planning', element: <PlanningScreen /> },
       { path: 'revue', element: <ReviewScreen /> },
       { path: 'sessions', element: <HistoryScreen /> },
       { path: 'ajout-manuel', element: <ManualEntryScreen /> },

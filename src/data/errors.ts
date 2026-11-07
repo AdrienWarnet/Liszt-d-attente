@@ -9,6 +9,7 @@ export type ValidationCode =
   | 'sessionEnded'
   | 'taskRunning'
   | 'durationInvalid'
+  | 'hasTime'
 
 export class ValidationError extends Error {
   readonly code: ValidationCode

@@ -73,6 +73,18 @@ export const labels = {
     taskArchived: 'Tâche archivée',
     taskReactivated: 'Tâche réactivée',
     reviewLink: 'Revue de semaine',
+    // Suppression sans temps (lot 3)
+    deleteTask: (label: string) => `Supprimer la tâche ${label}`,
+    taskDeleted: 'Tâche supprimée',
+    taskHasTime: 'Cette tâche a du temps enregistré : archive-la plutôt.',
+    deleteSection: (name: string) => `Supprimer la section ${name}`,
+    deleteSectionTitle: (name: string) => `Supprimer « ${name} » ?`,
+    deleteSectionText: (n: number) =>
+      n > 0
+        ? `La section et ${plural(n, 'sa tâche', `ses ${n} tâches`)} seront supprimées.`
+        : 'La section sera supprimée.',
+    sectionHasTime: 'Une tâche de cette section a du temps enregistré : archive ses tâches plutôt.',
+    sectionDeleted: 'Section supprimée',
   },
 
   review: {
@@ -198,6 +210,24 @@ export const labels = {
     recent: 'Derniers ajouts manuels',
     none: 'Aucun ajout manuel.',
     remove: (task: string) => `Supprimer l’ajout manuel ${task}`,
+  },
+
+  planning: {
+    title: 'Planning',
+    initial: 'Prévu initial',
+    revised: 'Prévu revu',
+    rowInitial: 'initial',
+    rowRevised: 'revu',
+    rowToPlace: 'à placer',
+    hint: 'Touche une case pour placer ou retirer une semaine. Le premier placement d’une section est gardé comme prévu initial.',
+    firstPlacement: 'Premier placement gardé comme prévu initial',
+    progress: 'Avancement',
+    progressPlaceholder: 'Où en est cette section ?',
+    changed: 'modifié',
+    cell: (section: string, week: string, placed: boolean) =>
+      `${section}, ${week}, ${placed ? 'placée' : 'vide'}`,
+    initialCell: (section: string, week: string, placed: boolean) =>
+      `${section}, prévu initial, ${week}, ${placed ? 'placée' : 'vide'}`,
   },
 
   errors: {

@@ -15,6 +15,7 @@ import {
   listHistory,
   listManualEntries,
 } from './sessions'
+import { getProjectPlanning } from './planning'
 import type { Day, Timestamp, WeekStart } from './types'
 import { getDayOverview, getDayPlan, getWeekOverview } from './week'
 
@@ -89,4 +90,13 @@ export function useBannerState(now: Timestamp) {
 
 export function useManualEntries() {
   return useLiveQuery(() => listManualEntries())
+}
+
+// ---------- Planning (5.1) ----------
+
+export function useProjectPlanning(projectId: string | undefined, now: Timestamp) {
+  return useLiveQuery(
+    async () => (projectId ? getProjectPlanning(projectId, now) : null),
+    [projectId, now],
+  )
 }

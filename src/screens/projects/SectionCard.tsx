@@ -1,6 +1,18 @@
 import { useState, type ReactNode } from 'react'
+import { CloseIcon } from '../../components/icons'
+import { Sheet } from '../../components/Sheet'
+import { useToast } from '../../components/Toast'
 import { ui } from '../../components/ui'
-import { createTask, updateSection, updateTask, type SectionWithTasks } from '../../data/projects'
+import { isValidationError } from '../../data/errors'
+import {
+  createTask,
+  deleteSection,
+  deleteTask,
+  getSectionDeletionInfo,
+  updateSection,
+  updateTask,
+  type SectionWithTasks,
+} from '../../data/projects'
 import type { Section, Task } from '../../data/types'
 import { labels } from '../../labels'
 
@@ -48,6 +60,7 @@ export function AddTaskInput({ section }: { section: Section }) {
 /** Libellé de tâche modifiable sur place (ajout au proto validé par le PO). */
 function TaskLabel({ task }: { task: Task }) {
   const [draft, setDraft] = useState<string | null>(null)
+  const toast = useToast()
   const commit = async () => {
     if (draft !== null && draft.trim() !== '' && draft.trim() !== task.label) {
       await updateTask(task.id, { label: draft })
@@ -68,18 +81,39 @@ function TaskLabel({ task }: { task: Task }) {
     )
   }
   return (
-    <input
-      autoFocus
-      className={`${ui.input} min-w-0 flex-1 py-2`}
-      aria-label={labels.projects.editTask(task.label)}
-      value={draft}
-      onChange={(e) => setDraft(e.target.value)}
-      onBlur={commit}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') e.currentTarget.blur()
-        if (e.key === 'Escape') setDraft(null)
-      }}
-    />
+    <>
+      <input
+        autoFocus
+        className={`${ui.input} min-w-0 flex-1 py-2`}
+        aria-label={labels.projects.editTask(task.label)}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') e.currentTarget.blur()
+          if (e.key === 'Escape') setDraft(null)
+        }}
+      />
+      {/* Supprimer une tâche créée par erreur (lot 3) : seulement sans temps enregistré. */}
+      <button
+        type="button"
+        className={ui.iconButton}
+        aria-label={labels.projects.deleteTask(task.label)}
+        onPointerDown={(e) => e.preventDefault()} // garde le champ actif jusqu'au clic
+        onClick={async () => {
+          try {
+            await deleteTask(task.id)
+            toast(labels.projects.taskDeleted)
+          } catch (e) {
+            if (!isValidationError(e, 'hasTime')) throw e
+            setDraft(null)
+            toast(labels.projects.taskHasTime)
+          }
+        }}
+      >
+        <CloseIcon />
+      </button>
+    </>
   )
 }
 
@@ -93,10 +127,43 @@ interface SectionCardProps {
 
 /** Carte d'une section dans le détail projet (proto `V.projet`). */
 export function SectionCard({ data, taskAction, footer }: SectionCardProps) {
-  const { section, activeTasks } = data
+  const { section, activeTasks, archivedTasks } = data
+  const [confirming, setConfirming] = useState(false)
+  const toast = useToast()
+
+  const askDelete = async () => {
+    if ((await getSectionDeletionInfo(section.id)).hasTime) toast(labels.projects.sectionHasTime)
+    else setConfirming(true)
+  }
+
   return (
     <section className={ui.card} aria-label={section.name}>
-      <strong>{section.name}</strong>
+      <div className="flex items-center justify-between gap-2">
+        <strong>{section.name}</strong>
+        <button
+          type="button"
+          className="min-h-11 shrink-0 rounded-lg px-2 text-xs font-semibold text-muted"
+          aria-label={labels.projects.deleteSection(section.name)}
+          onClick={askDelete}
+        >
+          {labels.projects.delete}
+        </button>
+      </div>
+      <Sheet
+        open={confirming}
+        title={labels.projects.deleteSectionTitle(section.name)}
+        onClose={() => setConfirming(false)}
+        confirmLabel={labels.projects.delete}
+        onConfirm={async () => {
+          await deleteSection(section.id)
+          setConfirming(false)
+          toast(labels.projects.sectionDeleted)
+        }}
+      >
+        <p className={`${ui.fact} text-[15px]`}>
+          {labels.projects.deleteSectionText(activeTasks.length + archivedTasks.length)}
+        </p>
+      </Sheet>
       <ProgressField section={section} placeholder={labels.projects.progressPlaceholder} />
       <ul>
         {activeTasks.map((task) => (

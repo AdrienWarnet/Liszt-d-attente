@@ -47,8 +47,8 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 ## Epic 5 — Planning macro (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
-| 5.1 | Fonctions données du planning | Donnée | CC | 1.4, 2.1 | À faire |
-| 5.2 | Écran Planning d'un projet | Front | CC | 2.3, 5.1 | À faire |
+| 5.1 | Fonctions données du planning | Donnée | CC | 1.4, 2.1 | Fait |
+| 5.2 | Écran Planning d'un projet | Front | CC | 2.3, 5.1 | Fait |
 
 ## Epic 6 — Bilan (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
@@ -83,6 +83,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 |---|---|---|---|---|---|
 | Lot 1 | `lot-1-tokens-et-en-tete-du-proto` | Reprise de 1.5 / 1.7 d'après le proto : tokens renommés et complétés comme le proto (`screen`, `felt`, `felt-soft`, `key`, `scrim`, `c0`–`c5`, `over`, `over-soft`, `danger`, clair et sombre — valeurs dans CLAUDE.md) ; en-tête d'écran avec sous-titre et bouton retour sur les sous-écrans ; feuille modale en bas d'écran et message bref (toast) réutilisables. Préalable aux tickets Front des epics 2 à 7. | CC | Fait | — |
 | Lot 2 | `lot-2-choix-du-theme` | Demande du PO (07/11/2026) : choix du thème dans l'onglet Plus — Automatique (suit le téléphone, par défaut), Clair, Sombre ; choix mémorisé sur le téléphone et appliqué dès l'ouverture. | CC | Fait | — |
+| Lot 3 | `lot-3-supprimer-section-ou-tache-sans-temps` | Demande du PO (07/11/2026) : supprimer une tâche ou une section créée par erreur, seulement si aucun temps n'y est enregistré (sinon : message, archiver à la place). Tâche : ✕ en modifiant son libellé. Section : « Supprimer » dans sa carte + confirmation. Ses tâches, jours prévus et placements partent avec elle. | CC | Fait | — |
 
 ## Hypothèses à vérifier
 | # | Hypothèse | Quand | Résultat |
@@ -130,3 +131,5 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | 07/11/2026 | Téléphone cible : Android, écran de 360 à 412 px de large (Adele : Redmi Note 9 ou Honor, modèle exact inconnu ; PO : Nothing Phone 3). Installation validée sur le téléphone d'Adele (1.6) | Info PO | Tous les écrans |
 | 07/11/2026 | Epic par epic : CC enchaîne tous les tickets d'une epic sans validation par ticket (statut `À vérifier`), le PO vérifie en fin d'epic avant le merge dans `main` | Choix PO | Workflow, à partir de l'epic 2 |
 | 07/11/2026 | Thème au choix dans Plus (Automatique / Clair / Sombre), mémorisé dans le navigateur (`localStorage`), pas dans la base | Demande PO ; préférence d'affichage, appliquée avant le premier affichage | Lot 2 |
+| 07/11/2026 | Planning : la plage de semaines inclut toujours la semaine courante et les 7 suivantes, en plus des placements et dates du projet | Sinon une section ne peut pas être placée quand seule une date de début existe (règle 5.1 incomplète) | 5.1, 5.2 |
+| 07/11/2026 | Suppression d'une section ou d'une tâche autorisée seulement sans temps enregistré (remplace « pas de suppression au MVP ») | Demande PO ; le temps passé n'est jamais effacé | Lot 3, epic 2 |
