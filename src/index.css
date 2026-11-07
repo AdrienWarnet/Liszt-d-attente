@@ -1,1 +1,16 @@
 @import 'tailwindcss';
+
+@theme {
+  --color-accent: #3730a3;
+  --color-surface: #ffffff;
+  --color-ink: #0f172a;
+  --color-muted: #64748b;
+  --color-line: #e2e8f0;
+}
+
+html,
+body {
+  background-color: var(--color-surface);
+  /* Pas de surlignage gris au toucher sur Android. */
+  -webkit-tap-highlight-color: transparent;
+}

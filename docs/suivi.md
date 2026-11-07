@@ -12,7 +12,7 @@ Ordre conseillé : 1.1 → 1.2 → 1.3 → 1.4 → 1.5 → 1.6, puis 2.1 → 2.6
 | 1.2 | App installable et hors ligne | Technique | CC | 1.1 | Fait |
 | 1.3 | Déploiement GitHub Pages | Technique | CC + PO | 1.2 | À faire |
 | 1.4 | Base de données et utilitaires date / durée | Donnée | CC | 1.1 | Fait |
-| 1.5 | Navigation et mise en page mobile | Front | CC | 1.1 | À faire |
+| 1.5 | Navigation et mise en page mobile | Front | CC | 1.1 | Fait |
 | 1.6 | Valider l'installation sur le téléphone d'Adele | Décision | PO + Adele | 1.3 | À faire |
 
 ## Epic 2 — Projets, sections et tâches (MVP)
