@@ -32,6 +32,18 @@ const jsonFile = (content: unknown, name = 'sauvegarde.json') =>
   })
 
 describe('Écran Sauvegarde (7.2)', () => {
+  it('partage refusé par le navigateur : le fichier est téléchargé à la place', async () => {
+    const share = vi
+      .fn()
+      .mockRejectedValue(Object.assign(new Error('Permission denied'), { name: 'NotAllowedError' }))
+    Object.assign(navigator, { canShare: () => true, share })
+    renderApp('/plus/sauvegarde')
+    await userEvent.click(await screen.findByRole('button', { name: labels.backup.export }))
+    expect(await screen.findByRole('status')).toHaveTextContent(labels.backup.exported)
+    expect(URL.createObjectURL).toHaveBeenCalled()
+    expect(await getLastExportAt()).not.toBeNull()
+  })
+
   it('Plus : « Jamais » et rappel ; exporter (téléchargement) → « aujourd’hui », plus de rappel', async () => {
     await fill()
     renderApp('/plus')
