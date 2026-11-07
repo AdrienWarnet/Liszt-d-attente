@@ -1,11 +1,24 @@
-import { formatDayLabel, formatDayShort, toDay, weekDays } from './dates'
+import {
+  addDays,
+  addWeeks,
+  formatDayLabel,
+  formatDayMonth,
+  formatDayShort,
+  formatWeekLabel,
+  formatWeekShort,
+  parseDay,
+  toDay,
+  weekDays,
+  weekStart as weekStartOf,
+} from './dates'
 import { db } from './db'
 import { sumNullable } from './durations'
 import { getWeekPlanningAllProjects, type WeekPlanningGroup } from './planning'
 import { projectColorMap, type ProjectColor } from './projects'
-import { getCurrentSession, listRealEntries } from './sessions'
+import { getCurrentSession, listRealEntries, listRealEntriesForTasks } from './sessions'
 import type { Day, DurationSec, Project, Section, Task, Timestamp, WeekStart } from './types'
 import { getWeekBudget } from './week'
+import { labels } from '../labels'
 
 // Bilan : tableau de bord calculé à la volée (R23, R25). Les écrans ne font qu'afficher.
 
@@ -194,5 +207,151 @@ export async function getWeeklyReport(weekStart: WeekStart, now: Timestamp): Pro
     ),
     projects,
     planning: await getWeekPlanningAllProjects(weekStart),
+  }
+}
+
+// ---------- Bilan d'un projet (6.3) ----------
+
+/**
+ * Semaines en texte : « non placé », « sem. du 9 nov. », plage contiguë « 9 → 22 nov. »
+ * (« 26 oct. → 8 nov. » sur deux mois), sinon liste « 9 nov, 23 nov ».
+ */
+export function formatWeekRange(weeks: readonly WeekStart[]): string {
+  const sorted = [...new Set(weeks)].sort()
+  if (sorted.length === 0) return labels.weekRange.none
+  if (sorted.length === 1) return labels.weekRange.single(formatDayMonth(sorted[0]))
+  const contiguous = sorted.every((w, i) => i === 0 || addWeeks(sorted[i - 1], 1) === w)
+  if (!contiguous) return sorted.map(formatWeekShort).join(', ')
+  const start = parseDay(sorted[0])
+  const endDay = addDays(sorted[sorted.length - 1], 6)
+  const end = parseDay(endDay)
+  const sameMonth = start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()
+  return `${sameMonth ? start.getDate() : formatDayMonth(sorted[0])} → ${formatDayMonth(endDay)}`
+}
+
+export interface ProjectReportWeek {
+  weekStart: WeekStart
+  shortLabel: string
+  fullLabel: string
+  planned: DurationSec | null
+  real: DurationSec | null
+  gap: DurationSec | null
+  isCurrent: boolean
+}
+
+export interface ProjectReportSection {
+  section: Section
+  real: DurationSec | null
+  initialRange: string
+  revisedRange: string
+  progress: string | null
+  tasks: { task: Task; real: DurationSec | null; archived: boolean }[]
+}
+
+export interface ProjectReport {
+  project: Project
+  color: ProjectColor
+  realTotal: DurationSec | null
+  weeksWorked: number
+  activeTaskCount: number
+  weeks: ProjectReportWeek[]
+  defaultSelectedWeek: number
+  sections: ProjectReportSection[]
+}
+
+/**
+ * Bilan d'un projet sur toute sa durée (R24). Semaines : de la plus ancienne parmi date de
+ * début, placements, prévu et réel, jusqu'à la semaine suivant la semaine courante.
+ */
+export async function getProjectReport(
+  projectId: string,
+  now: Timestamp,
+): Promise<ProjectReport | null> {
+  const project = await db.projects.get(projectId)
+  if (!project) return null
+  const colors = projectColorMap(await db.projects.toArray())
+  const sections = (await db.sections.where('projectId').equals(projectId).toArray()).sort(
+    (a, b) => a.order - b.order || a.createdAt - b.createdAt,
+  )
+  const tasks = (await db.tasks.where('projectId').equals(projectId).toArray()).sort(
+    (a, b) => a.createdAt - b.createdAt,
+  )
+  const entries = await listRealEntriesForTasks(
+    tasks.map((t) => t.id),
+    now,
+  )
+  const plans = await db.projectWeekPlans.filter((p) => p.projectId === projectId).toArray()
+  const placements = await db.sectionPlacements
+    .where('sectionId')
+    .anyOf(sections.map((s) => s.id))
+    .toArray()
+
+  const realByTask = new Map<string, DurationSec>()
+  const realByWeek = new Map<WeekStart, DurationSec>()
+  for (const e of entries) {
+    realByTask.set(e.taskId, (realByTask.get(e.taskId) ?? 0) + e.durationSec)
+    const w = weekStartOf(e.day)
+    realByWeek.set(w, (realByWeek.get(w) ?? 0) + e.durationSec)
+  }
+
+  const currentWeek = weekStartOf(toDay(now))
+  const lastWeek = addWeeks(currentWeek, 1)
+  const first = [
+    currentWeek,
+    ...(project.startDate ? [weekStartOf(project.startDate)] : []),
+    ...placements.map((p) => p.weekStart),
+    ...plans.map((p) => p.weekStart),
+    ...realByWeek.keys(),
+  ].sort()[0]
+  const weeks: ProjectReportWeek[] = []
+  for (let w = first; w <= lastWeek; w = addWeeks(w, 1)) {
+    const planned = plans.find((p) => p.weekStart === w)?.durationSec ?? null
+    const real = realByWeek.get(w) ?? null
+    weeks.push({
+      weekStart: w,
+      shortLabel: formatWeekShort(w),
+      fullLabel: formatWeekLabel(w),
+      planned,
+      real,
+      gap: diff(real, planned),
+      isCurrent: w === currentWeek,
+    })
+  }
+
+  return {
+    project,
+    color: colors.get(projectId)!,
+    realTotal: sumNullable(entries.map((e) => e.durationSec)),
+    weeksWorked: realByWeek.size,
+    activeTaskCount: tasks.filter((t) => t.status === 'active').length,
+    weeks,
+    defaultSelectedWeek: defaultSelection(
+      weeks.map((w) => ({
+        highlight: w.isCurrent,
+        hasData: w.real !== null || w.planned !== null,
+      })),
+    ),
+    sections: sections.map((section) => {
+      const own = placements.filter((p) => p.sectionId === section.id)
+      const sectionTasks = tasks
+        .filter((t) => t.sectionId === section.id)
+        .map((task) => ({
+          task,
+          real: realByTask.get(task.id) ?? null,
+          archived: task.status === 'archived',
+        }))
+      return {
+        section,
+        real: sumNullable(sectionTasks.map((t) => t.real)),
+        initialRange: formatWeekRange(
+          own.filter((p) => p.kind === 'initial').map((p) => p.weekStart),
+        ),
+        revisedRange: formatWeekRange(
+          own.filter((p) => p.kind === 'revised').map((p) => p.weekStart),
+        ),
+        progress: section.progress,
+        tasks: sectionTasks,
+      }
+    }),
   }
 }

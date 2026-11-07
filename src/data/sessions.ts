@@ -532,3 +532,37 @@ export async function listManualEntries(
     .filter((e) => contexts.has(e.taskId))
     .map((entry) => ({ entry, context: contexts.get(entry.taskId)! }))
 }
+
+/** Entrées de temps réel de tâches données, sur toute la durée (bilan d'un projet, 6.3). */
+export async function listRealEntriesForTasks(
+  taskIds: readonly string[],
+  now: Timestamp,
+): Promise<RealEntry[]> {
+  const sessionTasks = await db.sessionTasks
+    .where('taskId')
+    .anyOf([...taskIds])
+    .toArray()
+  const sessions = new Map(
+    (await db.sessions.bulkGet([...new Set(sessionTasks.map((st) => st.sessionId))]))
+      .filter((s): s is Session => !!s)
+      .map((s) => [s.id, s]),
+  )
+  const segments = await db.timeSegments
+    .where('[sessionId+taskId]')
+    .anyOf(sessionTasks.map((st) => [st.sessionId, st.taskId]))
+    .toArray()
+  const entries: RealEntry[] = []
+  for (const st of sessionTasks) {
+    const session = sessions.get(st.sessionId)
+    if (!session) continue
+    const own = segments.filter((s) => s.sessionId === st.sessionId && s.taskId === st.taskId)
+    const durationSec = taskDuration(st, own, now)
+    if (durationSec !== null) entries.push({ taskId: st.taskId, day: session.day, durationSec })
+  }
+  const manual = await db.manualEntries
+    .where('taskId')
+    .anyOf([...taskIds])
+    .toArray()
+  for (const m of manual) entries.push({ taskId: m.taskId, day: m.day, durationSec: m.durationSec })
+  return entries
+}
