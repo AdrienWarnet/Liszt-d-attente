@@ -8,7 +8,7 @@ Utilisatrice unique : Adele, pianiste (cours avec Jenifer). Elle planifie son tr
 2. **Planning** : placement des sections sur des semaines ; le premier placement reste visible (prévu initial), les révisions forment le prévu revu.
 3. **Début de semaine** : budget jour par jour ; éventuellement temps prévu (tâche / jour, projet / semaine) ou tâches marquées prévues tel jour.
 4. **Au quotidien** : session → choix ou création de tâches → chrono tâche par tâche, pause, navigation libre pendant le chrono → fin de session. Oubli : ajout manuel ou correction d'un chrono.
-5. **En continu** : bilan semaine et projet.
+5. **En continu** : bilan semaine et projet (tableau de bord, R25).
 6. **Revue de semaine** (quand elle veut) : archiver, ajouter, mettre à jour l'avancement.
 
 ## Règles
@@ -32,7 +32,8 @@ Utilisatrice unique : Adele, pianiste (cours avec Jenifer). Elle planifie son tr
 - R10. Temps prévu projet : par projet et par semaine, facultatif.
 - R11. Temps prévu tâche : par tâche et par jour, facultatif.
 - R11b. Tâche marquable « prévue » un jour sans durée (durée `null`, marquage vrai).
-- R12. Dépassements (prévu > budget, réel > budget, réel > prévu) : constat affiché, jamais d'alerte ni de blocage.
+- R12. **RÈGLE MISE À JOUR (proto validé le 07/11/2026)** — Les dépassements du réel (réel > budget, réel > prévu) restent un constat neutre (couleur `ink`, pas de rouge). **Exception** : un temps prévu supérieur au budget (jour ou semaine) est signalé en rouge (`over`) avec « ▲ » et une phrase (« ▲ 0:30 au-dessus du budget de la semaine »). Ni popup ni blocage. Écart de moins d'une minute = « pile dans le budget ».
+  _Ancienne version : dépassements (prévu > budget, réel > budget, réel > prévu) : constat affiché, jamais d'alerte ni de blocage._
 
 **Planning**
 - R13. Section placée sur une ou plusieurs semaines. Premier placement = prévu initial (figé) ; modifications = prévu revu. Les deux visibles côte à côte.
@@ -48,10 +49,14 @@ Utilisatrice unique : Adele, pianiste (cours avec Jenifer). Elle planifie son tr
 - R21. Temps réel = chronos (corrigés) + ajouts manuels, y compris projets supprimés.
 - R22. Pas de commentaire de session, pas d'audio.
 
+**Affichage des tâches**
+- R26. **RÈGLE AJOUTÉE (proto validé le 07/11/2026)** — Partout où des tâches sont listées (session, prévu aujourd'hui, jour, ajout de tâches), elles sont groupées par projet (pastille de couleur + nom du projet), avec la section en petit au-dessus du libellé de la tâche.
+
 **Bilan**
 - R23. Bilan hebdo : budget vs réel (jour, semaine) ; par projet et par tâche : prévu vs réel.
 - R24. Bilan projet sur toute sa durée : réel cumulé par section et tâche ; planning (initial, revu, avancement).
-- R25. Calcul en continu, récap texte, pas de graphique.
+- R25. **RÈGLE MISE À JOUR (proto validé le 07/11/2026)** — Le bilan est un **tableau de bord** : chiffres clés, barres et graphiques, détail en dépliant. Calculé en continu.
+  _Ancienne version : calcul en continu, récap texte, pas de graphique._
 
 ## Priorisation
 - MVP : epics 1 à 7, puis démo à Adele après une semaine d'usage réel.
@@ -59,7 +64,8 @@ Utilisatrice unique : Adele, pianiste (cours avec Jenifer). Elle planifie son tr
 - P3 (pas de ticket) : synchro multi-appareils (Supabase), lecture auto des photos (OCR/IA via serveur).
 
 ## Hypothèses non vérifiées
-- H1. Format du récap texte du bilan (ticket 6.1).
+- H1. **HYPOTHÈSE MISE À JOUR (proto validé le 07/11/2026)** — Le format du bilan est celui du proto (`docs/design/proto-piano.html`, onglet Bilan et Bilan du projet), à confirmer avec Adele en démo (ticket 6.1).
+  _Ancienne version : format du récap texte du bilan (ticket 6.1)._
 - H2. Temps d'un projet supprimé affiché dans le bilan hebdo sous son nom, suffixé « (supprimé) ».
 - H3. Adele lancera le chrono à chaque session (observé pendant la démo).
 - H4. Une seule session en cours à la fois.

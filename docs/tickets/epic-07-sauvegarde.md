@@ -48,7 +48,8 @@ Route `/plus/sauvegarde` (1.5). Fonctions 7.1. Export : fichier `piano-sauvegard
 - Bouton « Exporter une sauvegarde ».
 - Bouton secondaire « Restaurer une sauvegarde » → choix du fichier → résumé (« 4 projets, 37 tâches, 21 sessions — exporté le 9 nov. ») → confirmation « Ceci remplace toutes les données actuelles de l'app. » → « Restaurer ».
 - Erreur lisible si le fichier est invalide : « Ce fichier n'est pas une sauvegarde de l'app Piano. »
-- Rappel discret dans l'onglet Plus (pastille) si aucune sauvegarde depuis plus de 7 jours.
+- Proto (`V.sauvegarde`, feuille `SH.restore`) : bouton principal « Exporter une sauvegarde » → message bref « Sauvegarde exportée » ; bouton pointillé « Restaurer une sauvegarde » → feuille en bas d'écran avec le résumé et l'avertissement, Annuler / Restaurer → message « Sauvegarde restaurée ».
+- Dans l'onglet Plus, la ligne « Sauvegarde » affiche à droite l'ancienneté de la dernière sauvegarde (« il y a 3 jours », « Jamais ») ; rappel discret (pastille) si aucune sauvegarde depuis plus de 7 jours.
 
 **Definition of Done**
 - Sur Chrome Android, « Exporter » ouvre la feuille de partage ou télécharge le fichier.
