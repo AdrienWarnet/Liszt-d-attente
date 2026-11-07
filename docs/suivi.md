@@ -20,7 +20,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
 | 2.1 | Fonctions données projets / sections / tâches | Donnée | CC | 1.4 | À vérifier |
-| 2.2 | Liste et création / édition de projet | Front | CC | 1.5, 2.1, lot 1 | À faire |
+| 2.2 | Liste et création / édition de projet | Front | CC | 1.5, 2.1, lot 1 | À vérifier |
 | 2.3 | Détail projet : sections, tâches, avancement | Front | CC | 2.2 | À faire |
 | 2.4 | Supprimer un projet avec confirmation | Front | CC | 2.3 | À faire |
 | 2.5 | Archiver et réactiver des tâches | Front | CC | 2.3 | À faire |
