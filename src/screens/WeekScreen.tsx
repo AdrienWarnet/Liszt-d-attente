@@ -11,6 +11,7 @@ import { useWeekOverview } from '../data/hooks'
 import { formatGap, setDailyBudget, type WeekOverview } from '../data/week'
 import type { WeekStart } from '../data/types'
 import { labels } from '../labels'
+import { PlannedByProject } from './week/PlannedByProject'
 
 function ProgressPanel({ week }: { week: WeekOverview['week'] }) {
   const gap = formatGap(week.real, week.budget)
@@ -95,6 +96,7 @@ export function WeekScreen() {
         <>
           <ProgressPanel week={overview.week} />
           <DailyBudgets overview={overview} ws={ws} />
+          <PlannedByProject overview={overview} ws={ws} />
         </>
       )}
       <Link to="/revue" className={`${ui.link} block`}>
