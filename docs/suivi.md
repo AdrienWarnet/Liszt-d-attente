@@ -54,10 +54,10 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
 | 6.1 | Valider le tableau de bord avec Adele | Décision | PO + Adele | — | À faire |
-| 6.2 | Calculs du bilan hebdo | Donnée | CC | 3.1, 4.1, 5.1 | À faire |
-| 6.3 | Calculs du bilan projet | Donnée | CC | 4.1, 5.1 | À faire |
-| 6.4 | Écran Bilan hebdo (tableau de bord) | Front | CC | 6.2, lot 1 | À faire |
-| 6.5 | Écran Bilan d'un projet (tableau de bord) | Front | CC | 6.3, 2.3, lot 1 | À faire |
+| 6.2 | Calculs du bilan hebdo | Donnée | CC | 3.1, 4.1, 5.1 | Fait |
+| 6.3 | Calculs du bilan projet | Donnée | CC | 4.1, 5.1 | Fait |
+| 6.4 | Écran Bilan hebdo (tableau de bord) | Front | CC | 6.2, lot 1 | Fait |
+| 6.5 | Écran Bilan d'un projet (tableau de bord) | Front | CC | 6.3, 2.3, lot 1 | Fait |
 
 ## Epic 7 — Sauvegarde (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |

@@ -16,6 +16,7 @@ import {
   listManualEntries,
 } from './sessions'
 import { getProjectPlanning } from './planning'
+import { getProjectReport, getWeeklyReport } from './report'
 import type { Day, Timestamp, WeekStart } from './types'
 import { getDayOverview, getDayPlan, getWeekOverview } from './week'
 
@@ -97,6 +98,19 @@ export function useManualEntries() {
 export function useProjectPlanning(projectId: string | undefined, now: Timestamp) {
   return useLiveQuery(
     async () => (projectId ? getProjectPlanning(projectId, now) : null),
+    [projectId, now],
+  )
+}
+
+// ---------- Bilan (6.2, 6.3) ----------
+
+export function useWeeklyReport(weekStart: WeekStart, now: Timestamp) {
+  return useLiveQuery(() => getWeeklyReport(weekStart, now), [weekStart, now])
+}
+
+export function useProjectReport(projectId: string | undefined, now: Timestamp) {
+  return useLiveQuery(
+    async () => (projectId ? getProjectReport(projectId, now) : null),
     [projectId, now],
   )
 }
