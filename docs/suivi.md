@@ -1,6 +1,6 @@
 # Suivi — Adele / Suivi de travail piano
 
-Statuts : `À faire` · `En cours` · `Bloqué` · `Fait`. Seul le PO passe un ticket en `Fait`.
+Statuts : `À faire` · `En cours` · `Bloqué` · `À vérifier` (fini par CC, en attente de la vérification de fin d'epic) · `Fait`. Seul le PO passe un ticket en `Fait`.
 Qui : PO · CC (Claude Code) · Adele
 
 Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 → 2.5, 4.1 → 2.6, 3.1 → 3.4, 4.2 → 4.6, 5.1 → 5.2, 6.2 → 6.5 (6.1 en parallèle), 7.1 → 7.3. 4.1 passe avant 3.1 : l’onglet Semaine affiche le temps réel.
@@ -19,7 +19,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 ## Epic 2 — Projets, sections et tâches (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
-| 2.1 | Fonctions données projets / sections / tâches | Donnée | CC | 1.4 | À faire |
+| 2.1 | Fonctions données projets / sections / tâches | Donnée | CC | 1.4 | À vérifier |
 | 2.2 | Liste et création / édition de projet | Front | CC | 1.5, 2.1, lot 1 | À faire |
 | 2.3 | Détail projet : sections, tâches, avancement | Front | CC | 2.2 | À faire |
 | 2.4 | Supprimer un projet avec confirmation | Front | CC | 2.3 | À faire |
@@ -127,3 +127,4 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | 07/11/2026 | Bouton « Supprimer » en rouge brique `danger` (action destructive, distinct du rouge `over`) | Choix PO | 2.3, 2.4 |
 | 07/11/2026 | Ajout manuel : jour choisi parmi les 14 derniers jours | Choix PO | 4.6 |
 | 07/11/2026 | Téléphone cible : Android, écran de 360 à 412 px de large (Adele : Redmi Note 9 ou Honor, modèle exact inconnu ; PO : Nothing Phone 3). Installation validée sur le téléphone d'Adele (1.6) | Info PO | Tous les écrans |
+| 07/11/2026 | Epic par epic : CC enchaîne tous les tickets d'une epic sans validation par ticket (statut `À vérifier`), le PO vérifie en fin d'epic avant le merge dans `main` | Choix PO | Workflow, à partir de l'epic 2 |
