@@ -11,6 +11,7 @@ export const ui = {
   chipDanger:
     'min-h-11 rounded-full border border-current px-3.5 text-[13px] font-semibold text-danger',
   card: 'mb-3 rounded-2xl border border-line px-4 py-3',
+  panel: 'mb-3 rounded-2xl border border-line px-3.5 pt-3.5 pb-2.5',
   input: 'w-full rounded-[10px] border border-line bg-screen px-3 py-2.5',
   label: 'mt-[18px] mb-1.5 block text-[13px] font-semibold text-muted',
   fact: 'mt-1 text-[13px] leading-snug text-muted',
