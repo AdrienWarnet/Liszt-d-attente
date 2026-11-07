@@ -47,7 +47,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 ## Epic 5 — Planning macro (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
-| 5.1 | Fonctions données du planning | Donnée | CC | 1.4, 2.1 | À faire |
+| 5.1 | Fonctions données du planning | Donnée | CC | 1.4, 2.1 | À vérifier |
 | 5.2 | Écran Planning d'un projet | Front | CC | 2.3, 5.1 | À faire |
 
 ## Epic 6 — Bilan (MVP)
@@ -130,3 +130,4 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | 07/11/2026 | Téléphone cible : Android, écran de 360 à 412 px de large (Adele : Redmi Note 9 ou Honor, modèle exact inconnu ; PO : Nothing Phone 3). Installation validée sur le téléphone d'Adele (1.6) | Info PO | Tous les écrans |
 | 07/11/2026 | Epic par epic : CC enchaîne tous les tickets d'une epic sans validation par ticket (statut `À vérifier`), le PO vérifie en fin d'epic avant le merge dans `main` | Choix PO | Workflow, à partir de l'epic 2 |
 | 07/11/2026 | Thème au choix dans Plus (Automatique / Clair / Sombre), mémorisé dans le navigateur (`localStorage`), pas dans la base | Demande PO ; préférence d'affichage, appliquée avant le premier affichage | Lot 2 |
+| 07/11/2026 | Planning : la plage de semaines inclut toujours la semaine courante et les 7 suivantes, en plus des placements et dates du projet | Sinon une section ne peut pas être placée quand seule une date de début existe (règle 5.1 incomplète) | 5.1, 5.2 |
