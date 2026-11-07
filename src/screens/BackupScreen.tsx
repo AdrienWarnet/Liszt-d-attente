@@ -25,7 +25,7 @@ async function shareOrDownload(file: File): Promise<boolean> {
       return true
     } catch (e) {
       if ((e as Error).name === 'AbortError') return false // partage annulé
-      throw e
+      // Partage refusé par le navigateur (ex. NotAllowedError) : on télécharge à la place.
     }
   }
   const url = URL.createObjectURL(file)
