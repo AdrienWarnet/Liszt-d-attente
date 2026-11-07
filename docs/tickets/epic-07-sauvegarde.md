@@ -40,14 +40,14 @@ Type : Front
 En tant qu'Adele, je veux enregistrer une sauvegarde sur mon téléphone (ou me l'envoyer) et la restaurer si besoin.
 
 **Contexte technique**
-Route `/plus/sauvegarde` (1.5). Fonctions 7.1. Export : fichier `piano-sauvegarde-YYYY-MM-DD.json` ; utiliser `navigator.share({ files })` si disponible (envoi par mail, Drive…), sinon téléchargement. Import : `<input type="file" accept="application/json">`.
+Route `/plus/sauvegarde` (1.5). Fonctions 7.1. Export : fichier `liszt-d-attente-sauvegarde-YYYY-MM-DD.json` (lot 4) ; utiliser `navigator.share({ files })` si disponible (envoi par mail, Drive…), sinon téléchargement. Import : `<input type="file" accept="application/json">`.
 
 **Référence visuelle**
 - Texte : « Tes données sont uniquement sur ce téléphone. Fais une sauvegarde régulièrement et garde le fichier ailleurs (mail, Drive). »
 - « Dernière sauvegarde : il y a 3 jours » ou « Jamais ».
 - Bouton « Exporter une sauvegarde ».
 - Bouton secondaire « Restaurer une sauvegarde » → choix du fichier → résumé (« 4 projets, 37 tâches, 21 sessions — exporté le 9 nov. ») → confirmation « Ceci remplace toutes les données actuelles de l'app. » → « Restaurer ».
-- Erreur lisible si le fichier est invalide : « Ce fichier n'est pas une sauvegarde de l'app Piano. »
+- Erreur lisible si le fichier est invalide : « Ce fichier n'est pas une sauvegarde de Liszt d’attente. »
 - Proto (`V.sauvegarde`, feuille `SH.restore`) : bouton principal « Exporter une sauvegarde » → message bref « Sauvegarde exportée » ; bouton pointillé « Restaurer une sauvegarde » → feuille en bas d'écran avec le résumé et l'avertissement, Annuler / Restaurer → message « Sauvegarde restaurée ».
 - Dans l'onglet Plus, la ligne « Sauvegarde » affiche à droite l'ancienneté de la dernière sauvegarde (« il y a 3 jours », « Jamais ») ; rappel discret (pastille) si aucune sauvegarde depuis plus de 7 jours.
 
