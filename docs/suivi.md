@@ -63,7 +63,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
 | 7.1 | Export et import JSON | Donnée | CC | 1.4 (+ tables v1) | À vérifier |
-| 7.2 | Écran Sauvegarde | Front | CC | 7.1 | À faire |
+| 7.2 | Écran Sauvegarde | Front | CC | 7.1 | À vérifier |
 | 7.3 | Checklist fin MVP et démo Adele | Décision | PO + Adele | Epics 1–7 | À faire |
 
 ## Epics P2 (après démo MVP)

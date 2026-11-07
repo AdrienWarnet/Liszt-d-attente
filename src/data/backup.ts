@@ -1,6 +1,7 @@
 import { db } from './db'
 import { toDay } from './dates'
 import type { Timestamp } from './types'
+import { labels } from '../labels'
 
 // Sauvegarde (7.1) : export complet et import sûr de toute la base.
 // Les `null` restent `null` (JSON les garde tels quels).
@@ -131,3 +132,15 @@ export function daysSinceExport(lastAt: Timestamp | null, now: Timestamp): numbe
 
 /** Rappel discret si aucune sauvegarde depuis plus de 7 jours (ou jamais). */
 export const BACKUP_REMINDER_DAYS = 7
+
+/** « il y a 3 jours », « hier », « aujourd'hui » ou « Jamais ». */
+export function lastExportText(lastAt: Timestamp | null | undefined, now: Timestamp): string {
+  const days = daysSinceExport(lastAt ?? null, now)
+  return days === null ? labels.backup.never : labels.backup.ago(days)
+}
+
+/** Vrai si un rappel discret est utile : jamais sauvegardé, ou plus de 7 jours. */
+export function needsBackupReminder(lastAt: Timestamp | null | undefined, now: Timestamp): boolean {
+  const days = daysSinceExport(lastAt ?? null, now)
+  return days === null || days > BACKUP_REMINDER_DAYS
+}
