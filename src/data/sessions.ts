@@ -318,14 +318,14 @@ export async function getRealTimeByTask(
 
 // ---------- Vues ----------
 
-interface TaskContext {
+export interface TaskContext {
   task: Task
   section: Section
   project: Project
   color: ProjectColor
 }
 
-async function taskContexts(taskIds: readonly string[]): Promise<Map<string, TaskContext>> {
+export async function taskContexts(taskIds: readonly string[]): Promise<Map<string, TaskContext>> {
   const tasks = (await db.tasks.bulkGet([...taskIds])).filter((t): t is Task => !!t)
   const sections = new Map((await db.sections.toArray()).map((s) => [s.id, s]))
   const projects = await db.projects.toArray()

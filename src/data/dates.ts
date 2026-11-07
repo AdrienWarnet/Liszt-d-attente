@@ -67,3 +67,27 @@ export function formatWeekLabel(start: WeekStart): string {
 export function formatDayMonth(day: Day): string {
   return dayMonthFormat.format(parseDay(day))
 }
+
+const dayShortFormat = new Intl.DateTimeFormat('fr-FR', { weekday: 'short', day: 'numeric' })
+const weekdayShortFormat = new Intl.DateTimeFormat('fr-FR', { weekday: 'short' })
+const dayTitleFormat = new Intl.DateTimeFormat('fr-FR', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'short',
+})
+
+/** Ex. « lun. 9 » */
+export function formatDayShort(day: Day): string {
+  return dayShortFormat.format(parseDay(day))
+}
+
+/** Ex. « lun » (touches du clavier des jours). */
+export function formatWeekdayShort(day: Day): string {
+  return weekdayShortFormat.format(parseDay(day)).replace('.', '')
+}
+
+/** Ex. « Lundi 9 nov. » (titre de la vue Jour). */
+export function formatDayTitle(day: Day): string {
+  const text = dayTitleFormat.format(parseDay(day))
+  return text.charAt(0).toUpperCase() + text.slice(1)
+}
