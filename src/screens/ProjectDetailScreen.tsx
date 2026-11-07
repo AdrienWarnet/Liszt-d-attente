@@ -3,10 +3,32 @@ import { useParams } from 'react-router'
 import { Screen } from '../components/Screen'
 import { ui } from '../components/ui'
 import { formatDayMonth } from '../data/dates'
-import { useProject } from '../data/hooks'
+import { useProject, useSectionsWithTasks } from '../data/hooks'
+import { createSection } from '../data/projects'
 import type { Project } from '../data/types'
 import { labels } from '../labels'
 import { ProjectFormSheet } from './projects/ProjectFormSheet'
+import { SectionCard } from './projects/SectionCard'
+
+/** Champ « + Nouvelle section » : Entrée pour valider. */
+function NewSectionInput({ projectId }: { projectId: string }) {
+  const [value, setValue] = useState('')
+  return (
+    <input
+      className={ui.input}
+      aria-label={labels.projects.newSection}
+      placeholder={labels.projects.newSection}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      onKeyDown={async (e) => {
+        if (e.key !== 'Enter' || value.trim() === '') return
+        // Vider tout de suite : on peut enchaîner la saisie suivante sans attendre la base.
+        setValue('')
+        await createSection(projectId, value)
+      }}
+    />
+  )
+}
 
 function projectSubtitle(project: Project) {
   return [
@@ -23,6 +45,7 @@ function projectSubtitle(project: Project) {
 export function ProjectDetailScreen() {
   const { id } = useParams()
   const data = useProject(id)
+  const sections = useSectionsWithTasks(id)
   const [editing, setEditing] = useState(false)
 
   if (data === undefined) return <Screen title="" back="/projets" />
@@ -42,6 +65,12 @@ export function ProjectDetailScreen() {
           {labels.projects.edit}
         </button>
       </div>
+
+      {sections?.length === 0 && <p className={`${ui.fact} mb-3`}>{labels.projects.noSection}</p>}
+      {sections?.map((data) => (
+        <SectionCard key={data.section.id} data={data} />
+      ))}
+      <NewSectionInput projectId={project.id} />
 
       {editing && (
         <ProjectFormSheet
