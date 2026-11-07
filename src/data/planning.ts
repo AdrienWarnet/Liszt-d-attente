@@ -43,13 +43,16 @@ export async function setSectionWeeks(sectionId: string, weekStarts: readonly We
  * Renvoie `true` si c'était le premier placement (devenu le prévu initial).
  */
 export async function toggleSectionWeek(sectionId: string, week: WeekStart): Promise<boolean> {
-  const current = await placementsOf(sectionId)
-  const first = !current.some((p) => p.kind === 'initial')
-  const revised = new Set(current.filter((p) => p.kind === 'revised').map((p) => p.weekStart))
-  if (revised.has(week)) revised.delete(week)
-  else revised.add(week)
-  await setSectionWeeks(sectionId, [...revised])
-  return first
+  // Lecture et écriture dans la même transaction : deux touchers rapides ne se marchent pas dessus.
+  return db.transaction('rw', db.sections, db.sectionPlacements, async () => {
+    const current = await placementsOf(sectionId)
+    const first = !current.some((p) => p.kind === 'initial')
+    const revised = new Set(current.filter((p) => p.kind === 'revised').map((p) => p.weekStart))
+    if (revised.has(week)) revised.delete(week)
+    else revised.add(week)
+    await setSectionWeeks(sectionId, [...revised])
+    return first
+  })
 }
 
 export interface SectionPlanning {

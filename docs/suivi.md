@@ -48,7 +48,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
 | 5.1 | Fonctions données du planning | Donnée | CC | 1.4, 2.1 | À vérifier |
-| 5.2 | Écran Planning d'un projet | Front | CC | 2.3, 5.1 | À faire |
+| 5.2 | Écran Planning d'un projet | Front | CC | 2.3, 5.1 | À vérifier |
 
 ## Epic 6 — Bilan (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |

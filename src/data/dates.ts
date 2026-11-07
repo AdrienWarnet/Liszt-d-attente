@@ -97,3 +97,8 @@ export function formatTimeOfDay(ms: number): string {
   const d = new Date(ms)
   return `${d.getHours()}:${pad(d.getMinutes())}`
 }
+
+/** Ex. « 9 nov » (colonnes du planning, sans point). */
+export function formatWeekShort(start: WeekStart): string {
+  return formatDayMonth(start).replace('.', '')
+}

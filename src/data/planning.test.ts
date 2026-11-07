@@ -89,6 +89,21 @@ describe('placements', () => {
   })
 })
 
+describe('touchers rapides', () => {
+  it('deux cases touchées sans attendre : les deux semaines sont gardées', async () => {
+    const { p, a } = await setup()
+    const [first, second] = await Promise.all([
+      toggleSectionWeek(a.id, S1),
+      toggleSectionWeek(a.id, S2),
+    ])
+    expect([first, second]).toEqual([true, false])
+    expect(await sectionOf(p.id, 'Passages à tempo')).toMatchObject({
+      initialWeeks: [S1],
+      revisedWeeks: [S1, S2],
+    })
+  })
+})
+
 describe('plage de semaines', () => {
   it('rien : semaine courante + 7 semaines', async () => {
     const { p } = await setup()

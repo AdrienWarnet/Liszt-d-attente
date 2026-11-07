@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 import { Screen } from '../components/Screen'
 import { Sheet } from '../components/Sheet'
 import { useToast } from '../components/Toast'
@@ -70,6 +70,12 @@ export function ProjectDetailScreen() {
         <button type="button" className={ui.chip} onClick={() => setEditing(true)}>
           {labels.projects.edit}
         </button>
+        <Link
+          to={`/projets/${project.id}/planning`}
+          className={`${ui.chip} inline-flex items-center`}
+        >
+          {labels.projects.planning}
+        </Link>
         <button type="button" className={ui.chipDanger} onClick={() => setConfirmDelete(true)}>
           {labels.projects.delete}
         </button>
