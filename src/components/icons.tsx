@@ -72,3 +72,19 @@ export function ChevronIcon() {
     </Icon>
   )
 }
+
+export function BackIcon() {
+  return (
+    <Icon width={22} height={22} strokeWidth={2}>
+      <path d="M15 5l-7 7 7 7" />
+    </Icon>
+  )
+}
+
+export function CloseIcon() {
+  return (
+    <Icon width={20} height={20} strokeWidth={2}>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </Icon>
+  )
+}
