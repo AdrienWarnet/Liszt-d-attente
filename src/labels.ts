@@ -31,6 +31,8 @@ export const labels = {
     backup: 'Sauvegarde',
     about: 'À propos',
     version: 'Version',
+    theme: 'Thème',
+    themes: { auto: 'Automatique', light: 'Clair', dark: 'Sombre' },
   },
 
   projects: {
