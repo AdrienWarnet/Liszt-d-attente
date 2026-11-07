@@ -29,10 +29,10 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 ## Epic 3 — Semaine et temps prévu (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
-| 3.1 | Fonctions données budget, temps prévu et vue semaine | Donnée | CC | 1.4, 2.1, 4.1 | À vérifier |
-| 3.2 | Onglet Semaine : vue globale et budget de chaque jour | Front | CC | 1.5, 3.1, lot 1 | À vérifier |
-| 3.3 | Temps prévu par projet / semaine | Front | CC | 3.2 | À vérifier |
-| 3.4 | Vue Jour : prévoir des tâches par jour | Front | CC | 3.2 | À vérifier |
+| 3.1 | Fonctions données budget, temps prévu et vue semaine | Donnée | CC | 1.4, 2.1, 4.1 | Fait |
+| 3.2 | Onglet Semaine : vue globale et budget de chaque jour | Front | CC | 1.5, 3.1, lot 1 | Fait |
+| 3.3 | Temps prévu par projet / semaine | Front | CC | 3.2 | Fait |
+| 3.4 | Vue Jour : prévoir des tâches par jour | Front | CC | 3.2 | Fait |
 
 ## Epic 4 — Sessions (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
