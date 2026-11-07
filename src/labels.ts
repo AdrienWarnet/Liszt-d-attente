@@ -171,6 +171,8 @@ export const labels = {
     title: 'Historique',
     subtitle: 'Sessions et ajouts manuels',
     inProgress: 'en cours',
+    when: (day: string, time: string) => `${day} · ${time}`,
+    path: (project: string, section: string) => `${project} › ${section}`,
     manualTag: 'Ajout manuel',
     corrected: '(corrigée)',
     correctHint: 'Modifie une durée pour la corriger (oubli d’arrêt du chrono).',
