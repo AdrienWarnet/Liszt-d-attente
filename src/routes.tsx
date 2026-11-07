@@ -2,6 +2,7 @@ import { Navigate, type RouteObject } from 'react-router'
 import { Layout } from './components/Layout'
 import { BackupScreen, ReportScreen, SessionScreen, WeekScreen } from './screens/EmptyScreens'
 import { MoreScreen } from './screens/MoreScreen'
+import { ProjectDetailScreen } from './screens/ProjectDetailScreen'
 import { ProjectsScreen } from './screens/ProjectsScreen'
 
 export const routes: RouteObject[] = [
@@ -11,6 +12,7 @@ export const routes: RouteObject[] = [
       { index: true, element: <SessionScreen /> },
       { path: 'semaine', element: <WeekScreen /> },
       { path: 'projets', element: <ProjectsScreen /> },
+      { path: 'projets/:id', element: <ProjectDetailScreen /> },
       { path: 'bilan', element: <ReportScreen /> },
       { path: 'plus', element: <MoreScreen /> },
       { path: 'plus/sauvegarde', element: <BackupScreen /> },
