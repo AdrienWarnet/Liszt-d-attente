@@ -37,7 +37,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 ## Epic 4 — Sessions (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
-| 4.1 | Moteur de session et de chrono | Donnée | CC | 1.4, 2.1 | À faire |
+| 4.1 | Moteur de session et de chrono | Donnée | CC | 1.4, 2.1 | À vérifier |
 | 4.2 | Démarrer une session, choisir ses tâches | Front | CC | 3.4, 4.1, lot 1 | À faire |
 | 4.3 | Session en cours : chronos, pause, fin | Front | CC | 4.2 | À faire |
 | 4.4 | Bandeau de chrono global | Front | CC | 4.3 | À faire |
