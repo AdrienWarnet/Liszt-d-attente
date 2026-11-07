@@ -249,14 +249,15 @@ export async function listActiveTasksGrouped(): Promise<ActiveTasksGroup[]> {
 // ---------- Suppression d'une tâche ou d'une section sans temps (lot 3) ----------
 
 /** Vrai si du temps est enregistré sur la tâche : chrono, correction ou ajout manuel. */
-async function taskHasTime(taskId: string): Promise<boolean> {
+export async function taskHasTime(taskId: string): Promise<boolean> {
   if ((await db.manualEntries.where('taskId').equals(taskId).count()) > 0) return true
   const sessionTasks = await db.sessionTasks.where('taskId').equals(taskId).toArray()
   if (sessionTasks.some((st) => st.correctedDurationSec !== null)) return true
   return (await db.timeSegments.filter((s) => s.taskId === taskId).count()) > 0
 }
 
-async function purgeTask(taskId: string) {
+/** Supprime une tâche et ce qui s'y rattache (jours prévus, place dans les sessions). */
+export async function purgeTask(taskId: string) {
   await db.taskDayPlans.filter((p) => p.taskId === taskId).delete()
   await db.sessionTasks.where('taskId').equals(taskId).delete()
   await db.tasks.delete(taskId)

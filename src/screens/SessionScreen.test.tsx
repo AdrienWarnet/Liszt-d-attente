@@ -102,9 +102,7 @@ describe('Démarrer une session (4.2)', () => {
 
     cleanup()
     renderApp(`/projets/${ballade.id}`)
-    expect(
-      await screen.findByRole('button', { name: labels.projects.editTask('Coda') }),
-    ).toBeInTheDocument()
+    expect(await screen.findByText('Coda', { selector: 'li' })).toBeInTheDocument()
   })
 
   it('la feuille se rouvre avec les tâches déjà dans la session cochées', async () => {

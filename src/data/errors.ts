@@ -10,14 +10,18 @@ export type ValidationCode =
   | 'taskRunning'
   | 'durationInvalid'
   | 'hasTime'
+  | 'sectionNameRequired'
 
 export class ValidationError extends Error {
   readonly code: ValidationCode
+  /** Précision pour le message (ex. libellés des tâches qui ont du temps). */
+  readonly details: string[]
 
-  constructor(code: ValidationCode) {
+  constructor(code: ValidationCode, details: string[] = []) {
     super(code)
     this.name = 'ValidationError'
     this.code = code
+    this.details = details
   }
 }
 
