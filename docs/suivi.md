@@ -62,7 +62,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 ## Epic 7 — Sauvegarde (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
-| 7.1 | Export et import JSON | Donnée | CC | 1.4 (+ tables v1) | À faire |
+| 7.1 | Export et import JSON | Donnée | CC | 1.4 (+ tables v1) | À vérifier |
 | 7.2 | Écran Sauvegarde | Front | CC | 7.1 | À faire |
 | 7.3 | Checklist fin MVP et démo Adele | Décision | PO + Adele | Epics 1–7 | À faire |
 
@@ -135,3 +135,4 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | 07/11/2026 | Planning : la plage de semaines inclut toujours la semaine courante et les 7 suivantes, en plus des placements et dates du projet | Sinon une section ne peut pas être placée quand seule une date de début existe (règle 5.1 incomplète) | 5.1, 5.2 |
 | 07/11/2026 | Suppression d'une section ou d'une tâche autorisée seulement sans temps enregistré (remplace « pas de suppression au MVP ») | Demande PO ; le temps passé n'est jamais effacé | Lot 3, epic 2 |
 | 07/11/2026 | Nom de l'app : « Liszt d’attente » (remplace « Piano ») ; noms internes (base `piano`) inchangés pour ne pas perdre les données | Demande PO | Lot 4, manifest |
+| 07/11/2026 | Sauvegarde : la date de dernière sauvegarde n'est mise à jour qu'une fois le fichier partagé ou téléchargé ; après une restauration, elle prend la date du fichier | Ne pas afficher « sauvegardé » si le partage est annulé | 7.1, 7.2 |
