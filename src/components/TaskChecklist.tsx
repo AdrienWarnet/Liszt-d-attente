@@ -4,16 +4,25 @@ interface TaskChecklistProps {
   groups: readonly ActiveTasksGroup[]
   checked: ReadonlySet<string>
   onToggle: (taskId: string) => void
+  /** Tâches déjà proposées ailleurs dans la feuille (ex. « Prévu aujourd'hui »). */
+  exclude?: ReadonlySet<string>
 }
 
 /** Tâches actives groupées projet → section, cases à cocher (feuilles du proto). */
-export function TaskChecklist({ groups, checked, onToggle }: TaskChecklistProps) {
+export function TaskChecklist({ groups, checked, onToggle, exclude }: TaskChecklistProps) {
   return (
     <>
       {groups.map(({ project, sections }) => (
-        <div key={project.id}>
+        <div
+          key={project.id}
+          hidden={sections.every((s) => s.tasks.every((t) => exclude?.has(t.id)))}
+        >
           <div className="mt-4 mb-0.5 text-sm font-bold">{project.name}</div>
           {sections
+            .map(({ section, tasks }) => ({
+              section,
+              tasks: tasks.filter((t) => !exclude?.has(t.id)),
+            }))
             .filter((s) => s.tasks.length > 0)
             .map(({ section, tasks }) => (
               <div key={section.id}>
