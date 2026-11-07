@@ -1,0 +1,43 @@
+@import 'tailwindcss';
+
+/* Direction artistique du proto : vert « feutre de piano », titres en serif. */
+@theme {
+  --color-accent: #2e5e4e;
+  --color-accent-soft: #e1ece7;
+  --color-surface: #fbfcfb;
+  --color-ink: #1b2421;
+  --color-muted: #68746f;
+  --color-line: #dce2df;
+  --color-ebony: #1e2522;
+
+  --font-sans: 'Manrope', system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+}
+
+/* Mode sombre : suit le réglage du téléphone (couleurs du proto). */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-accent: #7dbba4;
+    --color-accent-soft: #1f2d28;
+    --color-surface: #161b19;
+    --color-ink: #e7ece9;
+    --color-muted: #93a09a;
+    --color-line: #2a3330;
+    --color-ebony: #e7ece9;
+    color-scheme: dark;
+  }
+}
+
+html,
+body {
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  /* Pas de surlignage gris au toucher sur Android. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}

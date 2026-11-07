@@ -1,0 +1,23 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dépendances et build
+node_modules
+dist
+dist-ssr
+coverage
+*.local
+
+# Secrets et données locales (jamais commités)
+.env*
+*.export.json
+
+# Éditeurs
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.sw?
