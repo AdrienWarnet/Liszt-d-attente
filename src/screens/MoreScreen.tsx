@@ -19,6 +19,14 @@ export function MoreScreen() {
           </Link>
         </li>
         <li>
+          <Link to="/sessions" className={row}>
+            {labels.history.link}
+            <span className="text-muted">
+              <ChevronIcon />
+            </span>
+          </Link>
+        </li>
+        <li>
           <ThemePicker />
         </li>
         <li className={row}>
