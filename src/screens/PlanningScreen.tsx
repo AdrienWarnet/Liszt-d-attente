@@ -67,8 +67,12 @@ export function PlanningScreen() {
 
   if (!planning) return <Screen title={labels.planning.title} back={back} />
   const { weeks, currentWeek, sections, project } = planning
-  const name = 'sticky left-0 z-[1] max-w-[110px] truncate bg-screen pr-2 text-[13px] font-semibold'
-  const kindCell = 'pr-1.5 text-[11px] whitespace-nowrap text-muted'
+  // Nom figé à gauche : largeur fixée sur un bloc interne (une cellule de tableau ignore min/max-width).
+  const name = 'sticky left-0 z-[1] bg-screen pr-2'
+  const nameText = (text: string) => (
+    <div className="w-[102px] truncate text-[13px] font-semibold">{text}</div>
+  )
+  const kindCell = 'min-w-[44px] pr-1.5 text-[11px] whitespace-nowrap text-muted'
 
   return (
     <Screen title={labels.planning.title} subtitle={project.name} back={back}>
@@ -105,7 +109,7 @@ export function PlanningScreen() {
                 ? [
                     <tr key={`${plan.section.id}-i`}>
                       <td rowSpan={2} className={name}>
-                        {plan.section.name}
+                        {nameText(plan.section.name)}
                       </td>
                       <td className={kindCell}>{labels.planning.rowInitial}</td>
                       <Cells plan={plan} weeks={weeks} kind="initial" />
@@ -117,7 +121,7 @@ export function PlanningScreen() {
                   ]
                 : [
                     <tr key={plan.section.id}>
-                      <td className={name}>{plan.section.name}</td>
+                      <td className={name}>{nameText(plan.section.name)}</td>
                       <td className={kindCell}>{labels.planning.rowToPlace}</td>
                       <Cells plan={plan} weeks={weeks} kind="revised" />
                     </tr>,
