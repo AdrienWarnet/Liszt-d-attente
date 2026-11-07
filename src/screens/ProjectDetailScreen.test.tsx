@@ -43,8 +43,8 @@ describe('Détail projet', () => {
     const first = screen.getByRole('region', { name: 'Passages à tempo' })
     expect(
       within(first)
-        .getAllByRole('listitem')
-        .map((li) => li.textContent),
+        .getAllByRole('button', { name: /^Modifier la tâche/ })
+        .map((b) => b.textContent),
     ).toEqual(['m. 23-30', 'm. 45-52'])
   })
 
@@ -111,5 +111,36 @@ describe('Supprimer un projet', () => {
     expect(await screen.findByText(labels.projects.empty)).toBeInTheDocument()
     expect((await db.projects.get(p.id))?.deletedAt).toEqual(expect.any(Number))
     expect(await db.tasks.count()).toBe(1)
+  })
+})
+
+describe('Archiver et réactiver', () => {
+  it('archive, compte les archivées, réactive à sa place', async () => {
+    const p = await createProject({ name: 'Ballade' })
+    const s = await createSection(p.id, 'Page 1')
+    const a = await createTask(s.id, 'Lignes 1 et 2')
+    await createTask(s.id, 'Lignes 3 et 4')
+    renderApp(`/projets/${p.id}`)
+    const section = await screen.findByRole('region', { name: 'Page 1' })
+    expect(within(section).queryByText(/Tâches archivées/)).toBeNull()
+
+    await userEvent.click(
+      within(section).getByRole('button', { name: `${labels.projects.archive} Lignes 1 et 2` }),
+    )
+    expect(await screen.findByRole('status')).toHaveTextContent(labels.projects.taskArchived)
+    expect(await within(section).findByText(labels.projects.archivedTasks(1))).toBeInTheDocument()
+    expect((await db.tasks.get(a.id))?.status).toBe('archived')
+
+    await userEvent.click(within(section).getByText(labels.projects.archivedTasks(1)))
+    await userEvent.click(
+      within(section).getByRole('button', { name: `${labels.projects.reactivate} Lignes 1 et 2` }),
+    )
+    expect(await screen.findByText(labels.projects.taskReactivated)).toBeInTheDocument()
+    await screen.findByRole('button', { name: labels.projects.editTask('Lignes 1 et 2') })
+    expect(within(section).queryByText(/Tâches archivées/)).toBeNull()
+    const labelsInOrder = within(section)
+      .getAllByRole('button', { name: /^Modifier la tâche/ })
+      .map((b) => b.textContent)
+    expect(labelsInOrder).toEqual(['Lignes 1 et 2', 'Lignes 3 et 4'])
   })
 })
