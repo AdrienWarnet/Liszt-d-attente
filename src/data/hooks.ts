@@ -7,6 +7,7 @@ import {
   projectColorMap,
 } from './projects'
 import {
+  getBannerState,
   getCurrentSession,
   getRealTimeByTask,
   getRunningSegment,
@@ -79,4 +80,8 @@ export function useDayOverview(day: Day, now: Timestamp) {
 
 export function useDayPlan(day: Day) {
   return useLiveQuery(() => getDayPlan(day), [day])
+}
+
+export function useBannerState(now: Timestamp) {
+  return useLiveQuery(() => getBannerState(now), [now])
 }
