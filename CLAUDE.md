@@ -98,20 +98,21 @@ Authentification, multi-utilisateur, synchro multi-appareils, serveur, OCR / IA,
 4. Implémenter **uniquement** le périmètre du ticket. Ticket « Donnée » : tests Vitest obligatoires, dont le cas valeur absente (`null`).
 5. Vérifier : `npm run lint`, `npm run test`, `npm run build`.
 6. Contrôler chaque ligne de la Definition of Done.
-7. Rendre le mini compte-rendu (format ci-dessous). Ne pas passer le ticket en `Fait` : c'est le PO qui valide après test.
+7. Rendre le compte rendu (format ci-dessous). Ne pas passer le ticket en `Fait` : c'est le PO qui valide après test.
 8. Ticket de type **Décision** : ne pas coder. Préparer ce qui est demandé (exemple, question), puis s'arrêter.
 
-**Ne rien inventer.** Si une règle métier manque ou se contredit, poser la question au PO avant de coder. Si un choix technique non prévu est nécessaire, le faire au plus simple et le noter dans « Décisions prises ». Une hypothèse non vérifiée est marquée `// HYPOTHÈSE NON VÉRIFIÉE:` dans le code.
+**Ne rien inventer.** Si une règle métier manque ou se contredit, poser la question au PO avant de coder. Si un choix technique non prévu est nécessaire, le faire au plus simple et le noter dans le tableau « Décisions » de `docs/suivi.md`. Une hypothèse non vérifiée est marquée `// HYPOTHÈSE NON VÉRIFIÉE:` dans le code.
 
-Mini compte-rendu attendu en fin de ticket :
-```
-Fait : [3 lignes max]
-Écarts avec le ticket : [ou "aucun"]
-Décisions prises : [choix techniques ou métier non prévus]
-Tests : [ce qui a été testé, résultat]
-Points ouverts : [à valider par le PO]
-Fichiers modifiés : [liste courte]
-```
+Compte rendu en fin de ticket : court et clair, sans salutations, sans récap de ce qui a été lu, sans détail technique non demandé.
+1. Une ligne : « T<id> est prêt » + résultat des vérifications (tests, typecheck, lint, build). Si quelque chose échoue, le dire clairement avec l'erreur.
+2. « Ce qui marche » : 3 à 6 puces max, chacune = un comportement visible pour Adele (ou pour le PO sur un ticket technique), avec un exemple concret testé.
+3. Si besoin, « Défauts trouvés et corrigés en route » : 1 ligne par défaut (le problème, puis la correction).
+4. Si besoin, « Décision à prendre » : une question précise, la recommandation et l'endroit où la valeur se règle. Ne pas choisir une règle métier à la place du PO : proposer et demander.
+5. Si besoin, « À savoir » : une limite connue, ou ce qui est prévu dans un ticket suivant.
+6. Captures d'écran : liens cliquables, une par ligne.
+7. Dernière ligne : « Tu valides T<id> ? »
+
+Règles : phrases courtes, vocabulaire de l'utilisatrice (pas de noms de fonctions ou de fichiers, sauf un lien utile) ; chiffres concrets plutôt qu'adjectifs ; ne pas répéter ce qui est déjà validé ; une correction demandée en cours de ticket = 2 à 4 lignes (ce qui a changé, preuve, capture, « Tu valides ? ») ; ne rien inventer : ce qui n'a pas été vérifié est signalé.
 
 Après validation du PO : ticket `Fait` dans `docs/suivi.md`, décision éventuelle ajoutée au tableau « Décisions », puis commit selon le « Workflow Git ».
 
