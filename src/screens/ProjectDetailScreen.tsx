@@ -9,6 +9,7 @@ import { useProject, useSectionsWithTasks } from '../data/hooks'
 import { createSection, deleteProject } from '../data/projects'
 import type { Project } from '../data/types'
 import { labels } from '../labels'
+import { ArchiveButton, ArchivedTasks } from './projects/Archiving'
 import { ProjectFormSheet } from './projects/ProjectFormSheet'
 import { SectionCard } from './projects/SectionCard'
 
@@ -76,7 +77,12 @@ export function ProjectDetailScreen() {
 
       {sections?.length === 0 && <p className={`${ui.fact} mb-3`}>{labels.projects.noSection}</p>}
       {sections?.map((data) => (
-        <SectionCard key={data.section.id} data={data} />
+        <SectionCard
+          key={data.section.id}
+          data={data}
+          taskAction={(task) => <ArchiveButton task={task} />}
+          footer={<ArchivedTasks tasks={data.archivedTasks} />}
+        />
       ))}
       <NewSectionInput projectId={project.id} />
 
