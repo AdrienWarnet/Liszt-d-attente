@@ -11,7 +11,7 @@ Ordre conseillé : 1.1 → 1.2 → 1.3 → 1.4 → 1.5 → 1.6, puis 2.1 → 2.6
 | 1.1 | Initialiser le projet et l'outillage | Technique | CC | — | Fait |
 | 1.2 | App installable et hors ligne | Technique | CC | 1.1 | Fait |
 | 1.3 | Déploiement GitHub Pages | Technique | CC + PO | 1.2 | À faire |
-| 1.4 | Base de données et utilitaires date / durée | Donnée | CC | 1.1 | À faire |
+| 1.4 | Base de données et utilitaires date / durée | Donnée | CC | 1.1 | Fait |
 | 1.5 | Navigation et mise en page mobile | Front | CC | 1.1 | À faire |
 | 1.6 | Valider l'installation sur le téléphone d'Adele | Décision | PO + Adele | 1.3 | À faire |
 
@@ -111,3 +111,5 @@ Ordre conseillé : 1.1 → 1.2 → 1.3 → 1.4 → 1.5 → 1.6, puis 2.1 → 2.6
 | 07/11/2026 | TypeScript 6.0 (pas 7.0) ; ESLint au lieu d'oxlint du template Vite | typescript-eslint ne supporte pas TS 7 ; stack figée = ESLint | Outillage |
 | 07/11/2026 | Workflow Git : branche par epic puis par ticket, squash ticket → epic, `--no-ff` epic → `main`, pas de PR | Choix PO | Tous |
 | 07/11/2026 | Icône clavier blanc sur indigo #3730a3 (= couleur de thème) ; mise à jour PWA au prochain lancement, sans rechargement forcé | Pas de logo existant ; ne pas couper un chrono | Epic 1, epic 4 |
+| 07/11/2026 | Durées affichées arrondies à la minute la plus proche (chrono compris) ; saisie d'un nombre seul = minutes | Choix PO | Epics 3, 4, 6 |
+| 07/11/2026 | Compte rendu de fin de ticket au format défini dans CLAUDE.md | Choix PO | Tous |
