@@ -1,11 +1,14 @@
 import { Navigate, type RouteObject } from 'react-router'
 import { Layout } from './components/Layout'
-import { BackupScreen, ReportScreen, SessionScreen } from './screens/EmptyScreens'
+import { BackupScreen, ReportScreen } from './screens/EmptyScreens'
 import { DayScreen } from './screens/DayScreen'
+import { HistoryScreen } from './screens/HistoryScreen'
+import { ManualEntryScreen } from './screens/ManualEntryScreen'
 import { MoreScreen } from './screens/MoreScreen'
 import { ProjectDetailScreen } from './screens/ProjectDetailScreen'
 import { ProjectsScreen } from './screens/ProjectsScreen'
 import { ReviewScreen } from './screens/ReviewScreen'
+import { SessionScreen } from './screens/SessionScreen'
 import { WeekScreen } from './screens/WeekScreen'
 
 export const routes: RouteObject[] = [
@@ -18,6 +21,8 @@ export const routes: RouteObject[] = [
       { path: 'projets', element: <ProjectsScreen /> },
       { path: 'projets/:id', element: <ProjectDetailScreen /> },
       { path: 'revue', element: <ReviewScreen /> },
+      { path: 'sessions', element: <HistoryScreen /> },
+      { path: 'ajout-manuel', element: <ManualEntryScreen /> },
       { path: 'bilan', element: <ReportScreen /> },
       { path: 'plus', element: <MoreScreen /> },
       { path: 'plus/sauvegarde', element: <BackupScreen /> },

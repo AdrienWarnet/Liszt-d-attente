@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import { labels } from '../labels'
+import { ChronoBanner } from './ChronoBanner'
 import { BackIcon } from './icons'
 
 interface ScreenProps {
@@ -41,8 +42,8 @@ export function Screen({ title, subtitle, back, hideBanner, children }: ScreenPr
         </div>
       </header>
 
-      {/* Bandeau du chrono en cours (ticket 4.4) : masqué tant qu'il est vide. */}
-      {!hideBanner && <div data-slot="chrono-banner" className="shrink-0 empty:hidden" />}
+      {/* Bandeau du chrono en cours (4.4), sauf sur l'onglet Session. */}
+      {!hideBanner && <ChronoBanner />}
 
       <main className="min-h-0 flex-1 overflow-y-auto px-5 pb-6">{children}</main>
     </div>

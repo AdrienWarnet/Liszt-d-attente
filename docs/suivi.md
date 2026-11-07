@@ -38,11 +38,11 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
 | 4.1 | Moteur de session et de chrono | Donnée | CC | 1.4, 2.1 | Fait |
-| 4.2 | Démarrer une session, choisir ses tâches | Front | CC | 3.4, 4.1, lot 1 | À faire |
-| 4.3 | Session en cours : chronos, pause, fin | Front | CC | 4.2 | À faire |
-| 4.4 | Bandeau de chrono global | Front | CC | 4.3 | À faire |
-| 4.5 | Historique et correction d'un chrono | Front | CC | 4.3 | À faire |
-| 4.6 | Ajout manuel d'une durée | Front | CC | 4.1, 1.5 | À faire |
+| 4.2 | Démarrer une session, choisir ses tâches | Front | CC | 3.4, 4.1, lot 1 | Fait |
+| 4.3 | Session en cours : chronos, pause, fin | Front | CC | 4.2 | Fait |
+| 4.4 | Bandeau de chrono global | Front | CC | 4.3 | Fait |
+| 4.5 | Historique et correction d'un chrono | Front | CC | 4.3 | Fait |
+| 4.6 | Ajout manuel d'une durée | Front | CC | 4.1, 1.5 | Fait |
 
 ## Epic 5 — Planning macro (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
@@ -82,6 +82,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | Lot | Branche | Contenu | Qui | Statut | Non commité |
 |---|---|---|---|---|---|
 | Lot 1 | `lot-1-tokens-et-en-tete-du-proto` | Reprise de 1.5 / 1.7 d'après le proto : tokens renommés et complétés comme le proto (`screen`, `felt`, `felt-soft`, `key`, `scrim`, `c0`–`c5`, `over`, `over-soft`, `danger`, clair et sombre — valeurs dans CLAUDE.md) ; en-tête d'écran avec sous-titre et bouton retour sur les sous-écrans ; feuille modale en bas d'écran et message bref (toast) réutilisables. Préalable aux tickets Front des epics 2 à 7. | CC | Fait | — |
+| Lot 2 | `lot-2-choix-du-theme` | Demande du PO (07/11/2026) : choix du thème dans l'onglet Plus — Automatique (suit le téléphone, par défaut), Clair, Sombre ; choix mémorisé sur le téléphone et appliqué dès l'ouverture. | CC | Fait | — |
 
 ## Hypothèses à vérifier
 | # | Hypothèse | Quand | Résultat |
@@ -128,3 +129,4 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | 07/11/2026 | Ajout manuel : jour choisi parmi les 14 derniers jours | Choix PO | 4.6 |
 | 07/11/2026 | Téléphone cible : Android, écran de 360 à 412 px de large (Adele : Redmi Note 9 ou Honor, modèle exact inconnu ; PO : Nothing Phone 3). Installation validée sur le téléphone d'Adele (1.6) | Info PO | Tous les écrans |
 | 07/11/2026 | Epic par epic : CC enchaîne tous les tickets d'une epic sans validation par ticket (statut `À vérifier`), le PO vérifie en fin d'epic avant le merge dans `main` | Choix PO | Workflow, à partir de l'epic 2 |
+| 07/11/2026 | Thème au choix dans Plus (Automatique / Clair / Sombre), mémorisé dans le navigateur (`localStorage`), pas dans la base | Demande PO ; préférence d'affichage, appliquée avant le premier affichage | Lot 2 |

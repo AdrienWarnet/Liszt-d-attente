@@ -276,3 +276,38 @@ describe('vues', () => {
     expect((await listSessions({ from: '2026-11-08' })).map((x) => x.session.id)).toEqual([cur.id])
   })
 })
+
+describe('bandeau', () => {
+  it('rien sans session ; tâche en cours et son temps ; en pause → reprendre la dernière', async () => {
+    const { getBannerState } = await import('./sessions')
+    const { a, b } = await setup()
+    expect(await getBannerState()).toBeNull()
+    const s = await startSession()
+    expect(await getBannerState()).toEqual({ sessionId: s.id, running: null, resumeTaskId: null })
+    await setSessionTasks(s.id, [a.id, b.id])
+    expect((await getBannerState())?.resumeTaskId).toBe(a.id)
+    await startTask(s.id, b.id)
+    at(paris(9, 18, 12))
+    expect((await getBannerState())?.running).toEqual({
+      taskId: b.id,
+      label: 'm. 45-52',
+      durationSec: 720,
+    })
+    await pauseTask()
+    expect(await getBannerState()).toMatchObject({ running: null, resumeTaskId: b.id })
+  })
+})
+
+describe('ajouts manuels récents', () => {
+  it('du plus récent au plus ancien, avec la tâche', async () => {
+    const { listManualEntries } = await import('./sessions')
+    const { a, c } = await setup()
+    await addManualEntry(a.id, '2026-11-09', 600)
+    await addManualEntry(c.id, '2026-11-01', 900)
+    const list = await listManualEntries()
+    expect(list.map((x) => [x.context.task.label, x.entry.day])).toEqual([
+      ['Sonatine', '2026-11-01'],
+      ['m. 23-30', '2026-11-09'],
+    ])
+  })
+})

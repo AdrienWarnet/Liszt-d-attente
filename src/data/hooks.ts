@@ -7,11 +7,13 @@ import {
   projectColorMap,
 } from './projects'
 import {
+  getBannerState,
   getCurrentSession,
   getRealTimeByTask,
   getRunningSegment,
   getSessionView,
   listHistory,
+  listManualEntries,
 } from './sessions'
 import type { Day, Timestamp, WeekStart } from './types'
 import { getDayOverview, getDayPlan, getWeekOverview } from './week'
@@ -79,4 +81,12 @@ export function useDayOverview(day: Day, now: Timestamp) {
 
 export function useDayPlan(day: Day) {
   return useLiveQuery(() => getDayPlan(day), [day])
+}
+
+export function useBannerState(now: Timestamp) {
+  return useLiveQuery(() => getBannerState(now), [now])
+}
+
+export function useManualEntries() {
+  return useLiveQuery(() => listManualEntries())
 }

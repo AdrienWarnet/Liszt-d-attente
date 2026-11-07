@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 import { ChevronIcon } from '../components/icons'
 import { Screen } from '../components/Screen'
 import { labels } from '../labels'
+import { ThemePicker } from './more/ThemePicker'
 
 const row = 'flex min-h-14 items-center justify-between border-b border-line font-semibold'
 
@@ -16,6 +17,25 @@ export function MoreScreen() {
               <ChevronIcon />
             </span>
           </Link>
+        </li>
+        <li>
+          <Link to="/sessions" className={row}>
+            {labels.history.link}
+            <span className="text-muted">
+              <ChevronIcon />
+            </span>
+          </Link>
+        </li>
+        <li>
+          <Link to="/ajout-manuel" className={row}>
+            {labels.session.manualAdd}
+            <span className="text-muted">
+              <ChevronIcon />
+            </span>
+          </Link>
+        </li>
+        <li>
+          <ThemePicker />
         </li>
         <li className={row}>
           {labels.more.about}

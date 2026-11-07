@@ -8,8 +8,10 @@ import '@fontsource/instrument-serif/latin-400.css'
 import './index.css'
 import App from './App.tsx'
 import { requestPersistentStorage } from './pwa/persistStorage'
+import { applyTheme, getThemeChoice } from './theme'
 
 void requestPersistentStorage()
+applyTheme(getThemeChoice())
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

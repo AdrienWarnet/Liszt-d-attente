@@ -91,3 +91,9 @@ export function formatDayTitle(day: Day): string {
   const text = dayTitleFormat.format(parseDay(day))
   return text.charAt(0).toUpperCase() + text.slice(1)
 }
+
+/** Heure locale « 18:42 » d'un horodatage. */
+export function formatTimeOfDay(ms: number): string {
+  const d = new Date(ms)
+  return `${d.getHours()}:${pad(d.getMinutes())}`
+}

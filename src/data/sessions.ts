@@ -488,3 +488,47 @@ export async function listHistory(now: Timestamp = Date.now()): Promise<History>
     items: rows.map((r) => r.item),
   }
 }
+
+// ---------- Bandeau de chrono (4.4) ----------
+
+export interface BannerState {
+  sessionId: string
+  /** Chrono en cours, ou `null` si la session est en pause. */
+  running: { taskId: string; label: string; durationSec: DurationSec } | null
+  /** Tâche à relancer avec « Reprendre » : la dernière chronométrée, sinon la première de la session. */
+  resumeTaskId: string | null
+}
+
+export async function getBannerState(now: Timestamp = Date.now()): Promise<BannerState | null> {
+  const session = await getCurrentSession()
+  if (!session) return null
+  const segments = await db.timeSegments.filter((s) => s.sessionId === session.id).toArray()
+  const open = segments.find((s) => s.endedAt === null)
+  let running: BannerState['running'] = null
+  if (open) {
+    const task = await db.tasks.get(open.taskId)
+    running = {
+      taskId: open.taskId,
+      label: task?.label ?? '',
+      durationSec: await getSessionTaskDuration(session.id, open.taskId, now),
+    }
+  }
+  const last = segments.sort((a, b) => b.startedAt - a.startedAt)[0]
+  const first = (await db.sessionTasks.where('sessionId').equals(session.id).sortBy('order'))[0]
+  return { sessionId: session.id, running, resumeTaskId: last?.taskId ?? first?.taskId ?? null }
+}
+
+// ---------- Ajouts manuels récents (4.6) ----------
+
+/** Derniers ajouts manuels, du plus récent au plus ancien (ordre de saisie). */
+export async function listManualEntries(
+  limit = 20,
+): Promise<{ entry: ManualEntry; context: TaskContext }[]> {
+  const entries = (await db.manualEntries.toArray())
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .slice(0, limit)
+  const contexts = await taskContexts(entries.map((e) => e.taskId))
+  return entries
+    .filter((e) => contexts.has(e.taskId))
+    .map((entry) => ({ entry, context: contexts.get(entry.taskId)! }))
+}

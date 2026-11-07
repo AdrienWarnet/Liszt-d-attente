@@ -28,9 +28,9 @@
   --font-serif: 'Instrument Serif', Georgia, serif;
 }
 
-/* Mode sombre : suit le réglage du téléphone. */
+/* Mode sombre : suit le réglage du téléphone, sauf choix « Clair » ou « Sombre » dans Plus (lot 2). */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --color-screen: #161b19;
     --color-ink: #e7ece9;
     --color-muted: #93a09a;
@@ -49,6 +49,30 @@
     --color-c5: #d865aa;
     color-scheme: dark;
   }
+}
+
+:root[data-theme='dark'] {
+  --color-screen: #161b19;
+  --color-ink: #e7ece9;
+  --color-muted: #93a09a;
+  --color-line: #2a3330;
+  --color-felt: #7dbba4;
+  --color-felt-soft: #1f2d28;
+  --color-key: #212826;
+  --color-ebony: #e7ece9;
+  --color-scrim: rgb(0 0 0 / 0.6);
+  --color-over-soft: #3a1f1e;
+  --color-c0: #3987e5;
+  --color-c1: #d95926;
+  --color-c2: #199e70;
+  --color-c3: #9277e0;
+  --color-c4: #d39b2e;
+  --color-c5: #d865aa;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
 }
 
 html,
