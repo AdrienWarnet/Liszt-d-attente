@@ -2,7 +2,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import { db } from './db'
 import { setSectionWeeks } from './planning'
 import { archiveTask, createProject, createSection, createTask, deleteProject } from './projects'
-import { defaultSelection, getWeeklyReport } from './report'
+import { defaultSelection, formatWeekRange, getProjectReport, getWeeklyReport } from './report'
 import { addManualEntry, startSession, startTask } from './sessions'
 import { planTaskOnDay, setDailyBudget, setProjectWeekPlan } from './week'
 
@@ -136,5 +136,63 @@ describe('sélection par défaut', () => {
     expect(defaultSelection([col(false, true), col(true, false), col(false, true)])).toBe(1)
     expect(defaultSelection([col(false, true), col(false, true), col(false, false)])).toBe(1)
     expect(defaultSelection([col(false, false), col(false, false)])).toBe(0)
+  })
+})
+
+describe('bilan projet (6.3)', () => {
+  it('formatWeekRange : non placé, une semaine, plage contiguë, liste', () => {
+    expect(formatWeekRange([])).toBe('non placé')
+    expect(formatWeekRange(['2026-11-09'])).toBe('sem. du 9 nov.')
+    expect(formatWeekRange(['2026-11-16', '2026-11-09'])).toBe('9 → 22 nov.')
+    expect(formatWeekRange(['2026-10-26', '2026-11-02'])).toBe('26 oct. → 8 nov.')
+    expect(formatWeekRange(['2026-11-09', '2026-11-23'])).toBe('9 nov, 23 nov')
+  })
+
+  it('projet sans aucun temps : réel total null, sections présentes avec réel null', async () => {
+    const { ballade } = await setup()
+    const r = (await getProjectReport(ballade.id, MON_18H))!
+    expect(r.realTotal).toBeNull()
+    expect(r.weeksWorked).toBe(0)
+    expect(r.activeTaskCount).toBe(2)
+    expect(r.sections.map((s) => [s.section.name, s.real, s.initialRange, s.progress])).toEqual([
+      ['Passages', null, 'non placé', null],
+      ['Page 1', null, 'non placé', null],
+    ])
+    expect(r.weeks.map((w) => w.weekStart)).toEqual([WEEK, '2026-11-16'])
+    expect(r.defaultSelectedWeek).toBe(0)
+  })
+
+  it('réel total, semaines travaillées, plage avec un trou, planning et tâche archivée', async () => {
+    const { ballade, s1, a, b } = await setup()
+    await addManualEntry(a.id, '2026-10-27', 1 * H) // semaine du 26 oct.
+    await addManualEntry(b.id, WEEK, 2 * H)
+    await setProjectWeekPlan(ballade.id, '2026-10-26', 3 * H)
+    await setSectionWeeks(s1.id, [WEEK, '2026-11-16'])
+    await setSectionWeeks(s1.id, [WEEK, '2026-11-16', '2026-11-23'])
+    await archiveTask(a.id)
+    const r = (await getProjectReport(ballade.id, MON_18H))!
+    expect([r.realTotal, r.weeksWorked, r.activeTaskCount]).toEqual([3 * H, 2, 1])
+    expect(r.weeks.map((w) => [w.shortLabel, w.real, w.planned])).toEqual([
+      ['26 oct', 1 * H, 3 * H],
+      ['2 nov', null, null],
+      ['9 nov', 2 * H, null],
+      ['16 nov', null, null],
+    ])
+    expect(r.weeks[0].gap).toBe(-2 * H)
+    expect(r.defaultSelectedWeek).toBe(2)
+    expect(r.sections[0]).toMatchObject({
+      real: 1 * H,
+      initialRange: '9 → 22 nov.',
+      revisedRange: '9 → 29 nov.',
+    })
+    expect(r.sections[0].tasks[0]).toMatchObject({ real: 1 * H, archived: true })
+  })
+
+  it('le temps d’une session compte dans son projet, sur toute la durée', async () => {
+    const { ballade, a } = await setup()
+    const s = await startSession()
+    await startTask(s.id, a.id)
+    const r = (await getProjectReport(ballade.id, MON_18H + 30 * 60_000))!
+    expect(r.realTotal).toBe(1800)
   })
 })
