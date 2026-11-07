@@ -40,7 +40,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | 4.1 | Moteur de session et de chrono | Donnée | CC | 1.4, 2.1 | Fait |
 | 4.2 | Démarrer une session, choisir ses tâches | Front | CC | 3.4, 4.1, lot 1 | À vérifier |
 | 4.3 | Session en cours : chronos, pause, fin | Front | CC | 4.2 | À vérifier |
-| 4.4 | Bandeau de chrono global | Front | CC | 4.3 | À faire |
+| 4.4 | Bandeau de chrono global | Front | CC | 4.3 | À vérifier |
 | 4.5 | Historique et correction d'un chrono | Front | CC | 4.3 | À faire |
 | 4.6 | Ajout manuel d'une durée | Front | CC | 4.1, 1.5 | À faire |
 
