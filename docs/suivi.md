@@ -62,8 +62,8 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 ## Epic 7 — Sauvegarde (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
-| 7.1 | Export et import JSON | Donnée | CC | 1.4 (+ tables v1) | À vérifier |
-| 7.2 | Écran Sauvegarde | Front | CC | 7.1 | À vérifier |
+| 7.1 | Export et import JSON | Donnée | CC | 1.4 (+ tables v1) | Fait |
+| 7.2 | Écran Sauvegarde | Front | CC | 7.1 | Fait |
 | 7.3 | Checklist fin MVP et démo Adele | Décision | PO + Adele | Epics 1–7 | À faire |
 
 ## Epics P2 (après démo MVP)
@@ -84,7 +84,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | Lot 1 | `lot-1-tokens-et-en-tete-du-proto` | Reprise de 1.5 / 1.7 d'après le proto : tokens renommés et complétés comme le proto (`screen`, `felt`, `felt-soft`, `key`, `scrim`, `c0`–`c5`, `over`, `over-soft`, `danger`, clair et sombre — valeurs dans CLAUDE.md) ; en-tête d'écran avec sous-titre et bouton retour sur les sous-écrans ; feuille modale en bas d'écran et message bref (toast) réutilisables. Préalable aux tickets Front des epics 2 à 7. | CC | Fait | — |
 | Lot 2 | `lot-2-choix-du-theme` | Demande du PO (07/11/2026) : choix du thème dans l'onglet Plus — Automatique (suit le téléphone, par défaut), Clair, Sombre ; choix mémorisé sur le téléphone et appliqué dès l'ouverture. | CC | Fait | — |
 | Lot 3 | `lot-3-supprimer-section-ou-tache-sans-temps` | Demande du PO (07/11/2026) : supprimer une tâche ou une section créée par erreur, seulement si aucun temps n'y est enregistré (sinon : message, archiver à la place). Tâche : ✕ en modifiant son libellé. Section : « Supprimer » dans sa carte + confirmation. Ses tâches, jours prévus et placements partent avec elle. | CC | Fait | — |
-| Lot 4 | `lot-4-nom-de-l-app-liszt-d-attente` | Demande du PO (07/11/2026) : l'app s'appelle « Liszt d’attente » (nom du repo) au lieu de « Piano » : titre de l'onglet, nom installé sur l'écran d'accueil, manifest. Identifiants internes inchangés (base `piano`, clé du thème). | CC | À vérifier | — |
+| Lot 4 | `lot-4-nom-de-l-app-liszt-d-attente` | Demande du PO (07/11/2026) : l'app s'appelle « Liszt d’attente » (nom du repo) au lieu de « Piano » : titre de l'onglet, nom installé sur l'écran d'accueil, manifest. Identifiants internes inchangés (base `piano`, clé du thème). | CC | Fait | — |
 
 ## Hypothèses à vérifier
 | # | Hypothèse | Quand | Résultat |
