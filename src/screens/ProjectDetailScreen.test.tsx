@@ -1,8 +1,9 @@
 import { cleanup, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { db } from '../data/db'
 import { createProject, createSection, createTask } from '../data/projects'
+import { addManualEntry } from '../data/sessions'
 import { labels } from '../labels'
 import { clearDb, renderApp } from '../test/renderApp'
 
@@ -142,5 +143,68 @@ describe('Archiver et réactiver', () => {
       .getAllByRole('button', { name: /^Modifier la tâche/ })
       .map((b) => b.textContent)
     expect(labelsInOrder).toEqual(['Lignes 1 et 2', 'Lignes 3 et 4'])
+  })
+})
+
+describe('Supprimer une tâche ou une section sans temps (lot 3)', () => {
+  it('tâche sans temps : ✕ en modifiant le libellé la supprime', async () => {
+    const p = await createProject({ name: 'Ballade' })
+    const s = await createSection(p.id, 'Page 1')
+    const t = await createTask(s.id, 'Lignes 1 et 2')
+    renderApp(`/projets/${p.id}`)
+    await userEvent.click(
+      await screen.findByRole('button', { name: labels.projects.editTask('Lignes 1 et 2') }),
+    )
+    await userEvent.click(
+      screen.getByRole('button', { name: labels.projects.deleteTask('Lignes 1 et 2') }),
+    )
+    expect(await screen.findByRole('status')).toHaveTextContent(labels.projects.taskDeleted)
+    await vi.waitFor(() => expect(screen.queryByText('Lignes 1 et 2')).toBeNull())
+    expect(await db.tasks.get(t.id)).toBeUndefined()
+  })
+
+  it('tâche avec du temps : refus avec un message, la tâche reste', async () => {
+    const p = await createProject({ name: 'Ballade' })
+    const s = await createSection(p.id, 'Page 1')
+    const t = await createTask(s.id, 'Lignes 1 et 2')
+    await addManualEntry(t.id, '2026-11-09', 600)
+    renderApp(`/projets/${p.id}`)
+    await userEvent.click(
+      await screen.findByRole('button', { name: labels.projects.editTask('Lignes 1 et 2') }),
+    )
+    await userEvent.click(
+      screen.getByRole('button', { name: labels.projects.deleteTask('Lignes 1 et 2') }),
+    )
+    expect(await screen.findByRole('status')).toHaveTextContent(labels.projects.taskHasTime)
+    expect(await db.tasks.get(t.id)).toBeDefined()
+  })
+
+  it('section : confirmation avec le nombre de tâches, puis suppression ; refus si du temps', async () => {
+    const p = await createProject({ name: 'Ballade' })
+    const s1 = await createSection(p.id, 'Page 2')
+    await createTask(s1.id, 'a')
+    await createTask(s1.id, 'b')
+    const s2 = await createSection(p.id, 'Coda')
+    const c = await createTask(s2.id, 'c')
+    await addManualEntry(c.id, '2026-11-09', 600)
+    renderApp(`/projets/${p.id}`)
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: labels.projects.deleteSection('Coda') }),
+    )
+    expect(await screen.findByRole('status')).toHaveTextContent(labels.projects.sectionHasTime)
+    expect(screen.queryByRole('dialog')).toBeNull()
+
+    await userEvent.click(
+      screen.getByRole('button', { name: labels.projects.deleteSection('Page 2') }),
+    )
+    const dialog = await screen.findByRole('dialog', {
+      name: labels.projects.deleteSectionTitle('Page 2'),
+    })
+    expect(dialog).toHaveTextContent(labels.projects.deleteSectionText(2))
+    await userEvent.click(within(dialog).getByRole('button', { name: labels.projects.delete }))
+    await vi.waitFor(() => expect(screen.queryByRole('region', { name: 'Page 2' })).toBeNull())
+    expect(await db.sections.get(s1.id)).toBeUndefined()
+    expect(screen.getByRole('region', { name: 'Coda' })).toBeInTheDocument()
   })
 })

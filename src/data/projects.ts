@@ -245,3 +245,65 @@ export async function listActiveTasksGrouped(): Promise<ActiveTasksGroup[]> {
     })),
   }))
 }
+
+// ---------- Suppression d'une tâche ou d'une section sans temps (lot 3) ----------
+
+/** Vrai si du temps est enregistré sur la tâche : chrono, correction ou ajout manuel. */
+async function taskHasTime(taskId: string): Promise<boolean> {
+  if ((await db.manualEntries.where('taskId').equals(taskId).count()) > 0) return true
+  const sessionTasks = await db.sessionTasks.where('taskId').equals(taskId).toArray()
+  if (sessionTasks.some((st) => st.correctedDurationSec !== null)) return true
+  return (await db.timeSegments.filter((s) => s.taskId === taskId).count()) > 0
+}
+
+async function purgeTask(taskId: string) {
+  await db.taskDayPlans.filter((p) => p.taskId === taskId).delete()
+  await db.sessionTasks.where('taskId').equals(taskId).delete()
+  await db.tasks.delete(taskId)
+}
+
+const deletionTables = () => [
+  db.sections,
+  db.tasks,
+  db.sessionTasks,
+  db.timeSegments,
+  db.manualEntries,
+  db.taskDayPlans,
+  db.sectionPlacements,
+]
+
+/** Supprime une tâche créée par erreur. Refus (`hasTime`) si du temps y est enregistré. */
+export async function deleteTask(taskId: string): Promise<void> {
+  await db.transaction('rw', deletionTables(), async () => {
+    if (!(await db.tasks.get(taskId))) throw new ValidationError('notFound')
+    if (await taskHasTime(taskId)) throw new ValidationError('hasTime')
+    await purgeTask(taskId)
+  })
+}
+
+export interface SectionDeletionInfo {
+  taskCount: number
+  hasTime: boolean
+}
+
+export async function getSectionDeletionInfo(sectionId: string): Promise<SectionDeletionInfo> {
+  const tasks = await db.tasks.where('sectionId').equals(sectionId).toArray()
+  for (const t of tasks)
+    if (await taskHasTime(t.id)) return { taskCount: tasks.length, hasTime: true }
+  return { taskCount: tasks.length, hasTime: false }
+}
+
+/**
+ * Supprime une section, ses tâches (actives et archivées), leurs jours prévus et
+ * ses placements au planning. Refus (`hasTime`) si une de ses tâches a du temps.
+ */
+export async function deleteSection(sectionId: string): Promise<void> {
+  await db.transaction('rw', deletionTables(), async () => {
+    if (!(await db.sections.get(sectionId))) throw new ValidationError('notFound')
+    const tasks = await db.tasks.where('sectionId').equals(sectionId).toArray()
+    for (const t of tasks) if (await taskHasTime(t.id)) throw new ValidationError('hasTime')
+    for (const t of tasks) await purgeTask(t.id)
+    await db.sectionPlacements.where('sectionId').equals(sectionId).delete()
+    await db.sections.delete(sectionId)
+  })
+}
