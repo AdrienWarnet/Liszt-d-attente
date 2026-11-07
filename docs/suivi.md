@@ -10,7 +10,7 @@ Ordre conseillé : 1.1 → 1.2 → 1.3 → 1.4 → 1.5 → 1.6, puis 2.1 → 2.6
 |---|---|---|---|---|---|
 | 1.1 | Initialiser le projet et l'outillage | Technique | CC | — | Fait |
 | 1.2 | App installable et hors ligne | Technique | CC | 1.1 | Fait |
-| 1.3 | Déploiement GitHub Pages | Technique | CC + PO | 1.2 | À faire |
+| 1.3 | Déploiement GitHub Pages | Technique | CC + PO | 1.2 | Fait |
 | 1.4 | Base de données et utilitaires date / durée | Donnée | CC | 1.1 | Fait |
 | 1.5 | Navigation et mise en page mobile | Front | CC | 1.1 | Fait |
 | 1.6 | Valider l'installation sur le téléphone d'Adele | Décision | PO + Adele | 1.3 | À faire |
@@ -113,3 +113,4 @@ Ordre conseillé : 1.1 → 1.2 → 1.3 → 1.4 → 1.5 → 1.6, puis 2.1 → 2.6
 | 07/11/2026 | Icône clavier blanc sur indigo #3730a3 (= couleur de thème) ; mise à jour PWA au prochain lancement, sans rechargement forcé | Pas de logo existant ; ne pas couper un chrono | Epic 1, epic 4 |
 | 07/11/2026 | Durées affichées arrondies à la minute la plus proche (chrono compris) ; saisie d'un nombre seul = minutes | Choix PO | Epics 3, 4, 6 |
 | 07/11/2026 | Compte rendu de fin de ticket au format défini dans CLAUDE.md | Choix PO | Tous |
+| 07/11/2026 | Déploiement GitHub Pages « Deploy from a branch » (`gh-pages`) via `npm run deploy`, sans GitHub Actions | Actions n'avait pas marché sur un précédent projet du PO | Ticket 1.3 ; déploiement manuel après merge d'une epic sur `main` |
