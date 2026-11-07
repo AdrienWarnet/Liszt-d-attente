@@ -38,11 +38,11 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
 | 4.1 | Moteur de session et de chrono | Donnée | CC | 1.4, 2.1 | Fait |
-| 4.2 | Démarrer une session, choisir ses tâches | Front | CC | 3.4, 4.1, lot 1 | À vérifier |
-| 4.3 | Session en cours : chronos, pause, fin | Front | CC | 4.2 | À vérifier |
-| 4.4 | Bandeau de chrono global | Front | CC | 4.3 | À vérifier |
-| 4.5 | Historique et correction d'un chrono | Front | CC | 4.3 | À vérifier |
-| 4.6 | Ajout manuel d'une durée | Front | CC | 4.1, 1.5 | À vérifier |
+| 4.2 | Démarrer une session, choisir ses tâches | Front | CC | 3.4, 4.1, lot 1 | Fait |
+| 4.3 | Session en cours : chronos, pause, fin | Front | CC | 4.2 | Fait |
+| 4.4 | Bandeau de chrono global | Front | CC | 4.3 | Fait |
+| 4.5 | Historique et correction d'un chrono | Front | CC | 4.3 | Fait |
+| 4.6 | Ajout manuel d'une durée | Front | CC | 4.1, 1.5 | Fait |
 
 ## Epic 5 — Planning macro (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
@@ -82,7 +82,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | Lot | Branche | Contenu | Qui | Statut | Non commité |
 |---|---|---|---|---|---|
 | Lot 1 | `lot-1-tokens-et-en-tete-du-proto` | Reprise de 1.5 / 1.7 d'après le proto : tokens renommés et complétés comme le proto (`screen`, `felt`, `felt-soft`, `key`, `scrim`, `c0`–`c5`, `over`, `over-soft`, `danger`, clair et sombre — valeurs dans CLAUDE.md) ; en-tête d'écran avec sous-titre et bouton retour sur les sous-écrans ; feuille modale en bas d'écran et message bref (toast) réutilisables. Préalable aux tickets Front des epics 2 à 7. | CC | Fait | — |
-| Lot 2 | `lot-2-choix-du-theme` | Demande du PO (07/11/2026) : choix du thème dans l'onglet Plus — Automatique (suit le téléphone, par défaut), Clair, Sombre ; choix mémorisé sur le téléphone et appliqué dès l'ouverture. | CC | À vérifier | — |
+| Lot 2 | `lot-2-choix-du-theme` | Demande du PO (07/11/2026) : choix du thème dans l'onglet Plus — Automatique (suit le téléphone, par défaut), Clair, Sombre ; choix mémorisé sur le téléphone et appliqué dès l'ouverture. | CC | Fait | — |
 
 ## Hypothèses à vérifier
 | # | Hypothèse | Quand | Résultat |
