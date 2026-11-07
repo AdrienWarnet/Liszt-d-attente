@@ -14,6 +14,20 @@
   --font-serif: 'Instrument Serif', Georgia, serif;
 }
 
+/* Mode sombre : suit le réglage du téléphone (couleurs du proto). */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-accent: #7dbba4;
+    --color-accent-soft: #1f2d28;
+    --color-surface: #161b19;
+    --color-ink: #e7ece9;
+    --color-muted: #93a09a;
+    --color-line: #2a3330;
+    --color-ebony: #e7ece9;
+    color-scheme: dark;
+  }
+}
+
 html,
 body {
   background-color: var(--color-surface);
