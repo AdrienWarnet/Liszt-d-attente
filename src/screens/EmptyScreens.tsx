@@ -7,10 +7,6 @@ export function SessionScreen() {
   return <Screen title={labels.tabs.session} hideBanner />
 }
 
-export function WeekScreen() {
-  return <Screen title={labels.tabs.week} />
-}
-
 export function ReportScreen() {
   return <Screen title={labels.tabs.review} />
 }
