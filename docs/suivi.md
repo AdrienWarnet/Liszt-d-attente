@@ -14,6 +14,7 @@ Ordre conseillé : 1.1 → 1.2 → 1.3 → 1.4 → 1.5 → 1.6, puis 2.1 → 2.6
 | 1.4 | Base de données et utilitaires date / durée | Donnée | CC | 1.1 | Fait |
 | 1.5 | Navigation et mise en page mobile | Front | CC | 1.1 | Fait |
 | 1.6 | Valider l'installation sur le téléphone d'Adele | Décision | PO + Adele | 1.3 | À faire |
+| 1.7 | Direction artistique verte (reprise du proto) | Front | CC | 1.5 | Fait |
 
 ## Epic 2 — Projets, sections et tâches (MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
@@ -114,3 +115,4 @@ Ordre conseillé : 1.1 → 1.2 → 1.3 → 1.4 → 1.5 → 1.6, puis 2.1 → 2.6
 | 07/11/2026 | Durées affichées arrondies à la minute la plus proche (chrono compris) ; saisie d'un nombre seul = minutes | Choix PO | Epics 3, 4, 6 |
 | 07/11/2026 | Compte rendu de fin de ticket au format défini dans CLAUDE.md | Choix PO | Tous |
 | 07/11/2026 | Déploiement GitHub Pages « Deploy from a branch » (`gh-pages`) via `npm run deploy`, sans GitHub Actions | Actions n'avait pas marché sur un précédent projet du PO | Ticket 1.3 ; déploiement manuel après merge d'une epic sur `main` |
+| 07/11/2026 | Direction artistique du proto : vert feutre #2E5E4E, titres Instrument Serif, texte Manrope (polices embarquées) ; remplace l'indigo | Choix PO | Tous les écrans, icône |

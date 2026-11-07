@@ -7,7 +7,7 @@ import { labels } from './src/labels.ts'
 
 // GitHub Pages sert l'app sous /<nom-du-repo>/
 const base = '/Liszt-d-attente/'
-const themeColor = '#3730a3'
+const themeColor = '#2E5E4E'
 const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'))
 
 export default defineConfig({
@@ -33,7 +33,7 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait',
         theme_color: themeColor,
-        background_color: '#ffffff',
+        background_color: '#FBFCFB',
         icons: [
           { src: 'pwa-64x64.png', sizes: '64x64', type: 'image/png' },
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
@@ -47,7 +47,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest,woff2}'],
       },
     }),
   ],
