@@ -62,22 +62,23 @@ Déploiement (1.3). Test sur le téléphone d'Adele (1.6).
 
 ---
 
-## Ticket 1.3 — Déployer automatiquement sur GitHub Pages
+## Ticket 1.3 — Déployer sur GitHub Pages
 
 Type : Technique
 
-En tant que PO, je veux que chaque push sur `main` mette l'app en ligne, afin qu'Adele ait toujours la dernière version sans manipulation.
+En tant que PO, je veux mettre l'app en ligne en une commande après chaque epic, afin qu'Adele ait toujours la dernière version sans manipulation de sa part.
 
 **Contexte technique**
-GitHub Actions, actions officielles `actions/configure-pages`, `actions/upload-pages-artifact`, `actions/deploy-pages`. HashRouter (pas de réécriture d'URL nécessaire). Aucun secret.
+_Révisé le 07/11/2026 : GitHub Actions abandonné (n'avait pas fonctionné sur un précédent projet du PO)._
+GitHub Pages en mode « Deploy from a branch » : branche `gh-pages`, dossier racine. Le paquet `gh-pages` pousse le contenu de `dist/` sur cette branche. HashRouter (pas de réécriture d'URL nécessaire). Aucun secret.
 
 **À faire**
-- Workflow `.github/workflows/deploy.yml` : sur push `main` → `npm ci`, `npm run lint`, `npm run test`, `npm run build`, déploiement Pages.
-- Le déploiement échoue si lint, tests ou build échouent.
-- README : section « Déploiement » (activer Pages en source « GitHub Actions », URL de l'app).
+- Script `npm run deploy` : `lint`, `test`, `build`, puis publication de `dist/` sur `gh-pages`.
+- Le déploiement s'arrête si lint, tests ou build échouent.
+- README : section « Déploiement » (réglage Pages, commande, URL de l'app).
 
 **Definition of Done**
-- Un push sur `main` publie l'app à `https://<compte>.github.io/<repo>/`.
+- `npm run deploy` publie l'app à `https://<compte>.github.io/<repo>/`.
 - L'app publiée est installable (même contrôle que 1.2).
 - Un test volontairement cassé empêche le déploiement.
 

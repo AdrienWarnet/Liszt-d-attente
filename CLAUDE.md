@@ -11,7 +11,7 @@ Avant chaque ticket, lire : ce fichier, `docs/brief.md` (règles métier R1–R2
 - Routage : `react-router` en **HashRouter** (compatible GitHub Pages).
 - Tests : Vitest + Testing Library + `fake-indexeddb` pour la couche donnée.
 - Qualité : ESLint + Prettier.
-- Hébergement : GitHub Pages, déploiement GitHub Actions sur `main`. `base` Vite = `/<nom-du-repo>/`.
+- Hébergement : GitHub Pages en mode « Deploy from a branch » (`gh-pages`), publié par `npm run deploy` depuis `main`. Pas de GitHub Actions. `base` Vite = `/<nom-du-repo>/`.
 
 ## Commandes
 - `npm run dev` — lancer
@@ -125,7 +125,7 @@ Après validation du PO : ticket `Fait` dans `docs/suivi.md`, décision éventue
   2. Après validation : commit + push sur la branche du ticket. Message : `T1.1 – initialiser le projet`.
   3. Si on reprend le ticket : commits supplémentaires sur la même branche, puis push.
   4. Ticket validé définitivement : merge en local de `ticket-…` dans `epic-…` avec `git merge --squash` (un seul commit `T1.1 – …` par ticket sur l'epic), puis push de l'epic.
-- Epic validée définitivement : merge en local de `epic-…` dans `main` avec `git merge --no-ff` (message `Epic 1 – …`), push de `main` (déclenche le déploiement), puis vérification que le déploiement a réussi.
+- Epic validée définitivement : merge en local de `epic-…` dans `main` avec `git merge --no-ff` (message `Epic 1 – …`), push de `main`, puis `npm run deploy` depuis `main`, puis vérification que l'app en ligne est à jour.
 - Pas de pull request : tout se fait en git local + push.
 - Ne jamais pousser ni merger sans validation explicite du PO.
 - Avant de pousser, vérifier le compte : `git config user.email` = `Awarnet1009@gmail.com`, remote `https://AdrienWarnet@github.com/AdrienWarnet/Liszt-d-attente.git`.
