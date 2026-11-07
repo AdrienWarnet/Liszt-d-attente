@@ -200,6 +200,24 @@ export const labels = {
     remove: (task: string) => `Supprimer l’ajout manuel ${task}`,
   },
 
+  planning: {
+    title: 'Planning',
+    initial: 'Prévu initial',
+    revised: 'Prévu revu',
+    rowInitial: 'initial',
+    rowRevised: 'revu',
+    rowToPlace: 'à placer',
+    hint: 'Touche une case pour placer ou retirer une semaine. Le premier placement d’une section est gardé comme prévu initial.',
+    firstPlacement: 'Premier placement gardé comme prévu initial',
+    progress: 'Avancement',
+    progressPlaceholder: 'Où en est cette section ?',
+    changed: 'modifié',
+    cell: (section: string, week: string, placed: boolean) =>
+      `${section}, ${week}, ${placed ? 'placée' : 'vide'}`,
+    initialCell: (section: string, week: string, placed: boolean) =>
+      `${section}, prévu initial, ${week}, ${placed ? 'placée' : 'vide'}`,
+  },
+
   errors: {
     nameRequired: 'Donne un nom au projet.',
     endBeforeStart: 'La date de fin doit être après la date de début.',
