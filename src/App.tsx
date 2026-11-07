@@ -1,9 +1,8 @@
-import { labels } from './labels'
+import { createHashRouter, RouterProvider } from 'react-router'
+import { routes } from './routes'
+
+const router = createHashRouter(routes)
 
 export default function App() {
-  return (
-    <main className="min-h-dvh bg-white p-4 text-base text-slate-900">
-      <h1 className="text-2xl font-semibold">{labels.appName}</h1>
-    </main>
-  )
+  return <RouterProvider router={router} />
 }

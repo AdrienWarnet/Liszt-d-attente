@@ -6,4 +6,20 @@ export const labels = {
   emptyValue: '—',
   /** Préfixe du libellé de semaine : « Semaine du 9 nov. ». */
   weekOf: 'Semaine du',
+
+  /** Onglets de la barre du bas = titres des écrans. */
+  tabs: {
+    session: 'Session',
+    week: 'Semaine',
+    projects: 'Projets',
+    review: 'Bilan',
+    more: 'Plus',
+  },
+  mainNavigation: 'Navigation principale',
+
+  more: {
+    backup: 'Sauvegarde',
+    about: 'À propos',
+    version: 'Version',
+  },
 } as const
