@@ -76,6 +76,9 @@ export function ProjectDetailScreen() {
         >
           {labels.projects.planning}
         </Link>
+        <Link to={`/projets/${project.id}/bilan`} className={`${ui.chip} inline-flex items-center`}>
+          {labels.projects.report}
+        </Link>
         <button type="button" className={ui.chipDanger} onClick={() => setConfirmDelete(true)}>
           {labels.projects.delete}
         </button>
