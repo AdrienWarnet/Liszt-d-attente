@@ -81,7 +81,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 ## Lots après MVP
 | Lot | Branche | Contenu | Qui | Statut | Non commité |
 |---|---|---|---|---|---|
-| Lot 1 | `lot-1-tokens-et-en-tete-du-proto` | Reprise de 1.5 / 1.7 d'après le proto : tokens renommés et complétés comme le proto (`screen`, `felt`, `felt-soft`, `key`, `scrim`, `c0`–`c5`, `over`, `over-soft`, `danger`, clair et sombre — valeurs dans CLAUDE.md) ; en-tête d'écran avec sous-titre et bouton retour sur les sous-écrans ; feuille modale en bas d'écran et message bref (toast) réutilisables. Préalable aux tickets Front des epics 2 à 7. | CC | À faire | — |
+| Lot 1 | `lot-1-tokens-et-en-tete-du-proto` | Reprise de 1.5 / 1.7 d'après le proto : tokens renommés et complétés comme le proto (`screen`, `felt`, `felt-soft`, `key`, `scrim`, `c0`–`c5`, `over`, `over-soft`, `danger`, clair et sombre — valeurs dans CLAUDE.md) ; en-tête d'écran avec sous-titre et bouton retour sur les sous-écrans ; feuille modale en bas d'écran et message bref (toast) réutilisables. Préalable aux tickets Front des epics 2 à 7. | CC | À vérifier | — |
 
 ## Hypothèses à vérifier
 | # | Hypothèse | Quand | Résultat |

@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { describe, expect, it } from 'vitest'
@@ -71,9 +71,26 @@ describe('navigation', () => {
     expect(title()).toHaveTextContent('Session')
   })
 
-  it('la zone du bandeau de chrono est vide (donc masquée)', () => {
-    const { container } = render(<App />)
-    const slot = container.querySelector('[data-slot="chrono-banner"]')
-    expect(slot).toBeEmptyDOMElement()
+  it('la zone du bandeau de chrono est vide (donc masquée), et absente de l’onglet Session', () => {
+    renderAt('/bilan')
+    expect(document.querySelector('[data-slot="chrono-banner"]')).toBeEmptyDOMElement()
+    cleanup()
+    renderAt('/')
+    expect(document.querySelector('[data-slot="chrono-banner"]')).toBeNull()
+  })
+
+  it('un sous-écran a un bouton retour ; ouvert directement, il ramène à son parent', async () => {
+    const router = renderAt('/plus/sauvegarde')
+    expect(screen.queryByRole('button', { name: labels.common.back })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: labels.common.back }))
+    expect(router.state.location.pathname).toBe('/plus')
+    expect(screen.queryByRole('button', { name: labels.common.back })).toBeNull()
+  })
+
+  it('le retour revient à l’écran précédent dans l’historique', async () => {
+    const router = renderAt('/plus')
+    await userEvent.click(screen.getByRole('link', { name: labels.more.backup }))
+    await userEvent.click(screen.getByRole('button', { name: labels.common.back }))
+    expect(router.state.location.pathname).toBe('/plus')
   })
 })

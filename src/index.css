@@ -1,36 +1,59 @@
 @import 'tailwindcss';
 
-/* Direction artistique du proto : vert « feutre de piano », titres en serif. */
+/*
+ * Tokens du proto (docs/design/proto-piano.html), clair puis sombre.
+ * c3 à c5 : couleurs de projet ajoutées par le PO.
+ */
 @theme {
-  --color-accent: #2e5e4e;
-  --color-accent-soft: #e1ece7;
-  --color-surface: #fbfcfb;
+  --color-screen: #fbfcfb;
   --color-ink: #1b2421;
   --color-muted: #68746f;
   --color-line: #dce2df;
+  --color-felt: #2e5e4e;
+  --color-felt-soft: #e1ece7;
+  --color-key: #ffffff;
   --color-ebony: #1e2522;
+  --color-scrim: rgb(20 28 25 / 0.45);
+  --color-over: #d03b3b;
+  --color-over-soft: #fbe4e2;
+  --color-danger: #a2463a;
+  --color-c0: #2a78d6;
+  --color-c1: #eb6834;
+  --color-c2: #1baf7a;
+  --color-c3: #7d5bd0;
+  --color-c4: #c48a1c;
+  --color-c5: #c94f9a;
 
   --font-sans: 'Manrope', system-ui, sans-serif;
   --font-serif: 'Instrument Serif', Georgia, serif;
 }
 
-/* Mode sombre : suit le réglage du téléphone (couleurs du proto). */
+/* Mode sombre : suit le réglage du téléphone. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-accent: #7dbba4;
-    --color-accent-soft: #1f2d28;
-    --color-surface: #161b19;
+    --color-screen: #161b19;
     --color-ink: #e7ece9;
     --color-muted: #93a09a;
     --color-line: #2a3330;
+    --color-felt: #7dbba4;
+    --color-felt-soft: #1f2d28;
+    --color-key: #212826;
     --color-ebony: #e7ece9;
+    --color-scrim: rgb(0 0 0 / 0.6);
+    --color-over-soft: #3a1f1e;
+    --color-c0: #3987e5;
+    --color-c1: #d95926;
+    --color-c2: #199e70;
+    --color-c3: #9277e0;
+    --color-c4: #d39b2e;
+    --color-c5: #d865aa;
     color-scheme: dark;
   }
 }
 
 html,
 body {
-  background-color: var(--color-surface);
+  background-color: var(--color-screen);
   color: var(--color-ink);
   font-family: var(--font-sans);
   /* Pas de surlignage gris au toucher sur Android. */
@@ -38,6 +61,18 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-felt);
   outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sheet-in {
+    animation: sheet-up 0.2s ease-out;
+  }
+  @keyframes sheet-up {
+    from {
+      transform: translateY(30px);
+      opacity: 0.5;
+    }
+  }
 }
