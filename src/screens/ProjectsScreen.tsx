@@ -1,12 +1,10 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link } from 'react-router'
 import { Screen } from '../components/Screen'
 import { ui } from '../components/ui'
 import { formatDayMonth } from '../data/dates'
 import { useProjects } from '../data/hooks'
 import type { Project } from '../data/types'
 import { labels } from '../labels'
-import { ProjectFormSheet } from './projects/ProjectFormSheet'
 
 function projectLine(project: Project, activeTaskCount: number) {
   return [
@@ -21,8 +19,6 @@ function projectLine(project: Project, activeTaskCount: number) {
 /** Onglet Projets (proto `V.projets`). */
 export function ProjectsScreen() {
   const projects = useProjects()
-  const navigate = useNavigate()
-  const [creating, setCreating] = useState(false)
 
   return (
     <Screen title={labels.tabs.projects}>
@@ -39,22 +35,12 @@ export function ProjectsScreen() {
         </Link>
       ))}
 
-      <button type="button" className={ui.secondary} onClick={() => setCreating(true)}>
+      <Link to="/projets/nouveau" className={`${ui.secondary} block text-center`}>
         {labels.projects.newProject}
-      </button>
+      </Link>
       <Link to="/revue" className={`${ui.link} mt-2 block`}>
         {labels.projects.reviewLink}
       </Link>
-
-      {creating && (
-        <ProjectFormSheet
-          onClose={() => setCreating(false)}
-          onSaved={(project) => {
-            setCreating(false)
-            navigate(`/projets/${project.id}`)
-          }}
-        />
-      )}
     </Screen>
   )
 }

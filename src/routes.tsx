@@ -8,6 +8,7 @@ import { MoreScreen } from './screens/MoreScreen'
 import { PlanningScreen } from './screens/PlanningScreen'
 import { ProjectReportScreen } from './screens/ProjectReportScreen'
 import { ProjectDetailScreen } from './screens/ProjectDetailScreen'
+import { ProjectEditorScreen } from './screens/ProjectEditorScreen'
 import { ProjectsScreen } from './screens/ProjectsScreen'
 import { ReportScreen } from './screens/ReportScreen'
 import { ReviewScreen } from './screens/ReviewScreen'
@@ -22,7 +23,9 @@ export const routes: RouteObject[] = [
       { path: 'semaine', element: <WeekScreen /> },
       { path: 'semaine/jour/:day', element: <DayScreen /> },
       { path: 'projets', element: <ProjectsScreen /> },
+      { path: 'projets/nouveau', element: <ProjectEditorScreen /> },
       { path: 'projets/:id', element: <ProjectDetailScreen /> },
+      { path: 'projets/:id/modifier', element: <ProjectEditorScreen /> },
       { path: 'projets/:id/planning', element: <PlanningScreen /> },
       { path: 'projets/:id/bilan', element: <ProjectReportScreen /> },
       { path: 'revue', element: <ReviewScreen /> },

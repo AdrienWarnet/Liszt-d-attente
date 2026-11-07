@@ -9,17 +9,20 @@ interface ScreenProps {
   subtitle?: string | null
   /** Écran parent si l'historique de l'app est vide (lien ouvert directement). Affiche le bouton retour. */
   back?: string
+  /** Remplace le retour par défaut (ex. confirmer avant d'abandonner une saisie). */
+  onBack?: () => void
   /** Masque le bandeau de chrono (onglet Session). */
   hideBanner?: boolean
   children?: ReactNode
 }
 
 /** Squelette d'un écran du proto : en-tête, bandeau de chrono, contenu défilant. */
-export function Screen({ title, subtitle, back, hideBanner, children }: ScreenProps) {
+export function Screen({ title, subtitle, back, onBack, hideBanner, children }: ScreenProps) {
   const navigate = useNavigate()
   const location = useLocation()
   const goBack = () => {
-    if (location.key !== 'default') navigate(-1)
+    if (onBack) onBack()
+    else if (location.key !== 'default') navigate(-1)
     else if (back) navigate(back, { replace: true })
   }
 

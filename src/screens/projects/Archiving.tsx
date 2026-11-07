@@ -1,27 +1,9 @@
 import { useToast } from '../../components/Toast'
-import { archiveTask, reactivateTask } from '../../data/projects'
+import { reactivateTask } from '../../data/projects'
 import type { Task } from '../../data/types'
 import { labels } from '../../labels'
 
 const mini = 'min-h-11 shrink-0 rounded-lg px-2 text-xs font-semibold'
-
-/** Bouton « Archiver » à droite d'une tâche active (proto, détail projet). */
-export function ArchiveButton({ task }: { task: Task }) {
-  const toast = useToast()
-  return (
-    <button
-      type="button"
-      className={`${mini} text-muted`}
-      aria-label={`${labels.projects.archive} ${task.label}`}
-      onClick={async () => {
-        await archiveTask(task.id)
-        toast(labels.projects.taskArchived)
-      }}
-    >
-      {labels.projects.archive}
-    </button>
-  )
-}
 
 /** Bloc repliable « Tâches archivées (n) », masqué si n = 0. */
 export function ArchivedTasks({ tasks }: { tasks: Task[] }) {

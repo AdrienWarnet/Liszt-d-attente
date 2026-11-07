@@ -1,52 +1,42 @@
-import { cleanup, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { db } from '../data/db'
-import { createProject, createSection, createTask } from '../data/projects'
-import { addManualEntry } from '../data/sessions'
+import { archiveTask, createProject, createSection, createTask } from '../data/projects'
 import { labels } from '../labels'
 import { clearDb, renderApp } from '../test/renderApp'
 
 beforeEach(clearDb)
 
-const sectionNames = () => screen.getAllByRole('region').map((r) => r.getAttribute('aria-label'))
-
-describe('Détail projet', () => {
-  it('sans section : invite à en créer une, aucun champ de tâche', async () => {
+describe('Détail projet (consultation, lot 5)', () => {
+  it('sans section : invite à en ajouter, lien vers l’écran d’édition', async () => {
     const p = await createProject({ name: 'Ballade' })
-    renderApp(`/projets/${p.id}`)
+    const router = renderApp(`/projets/${p.id}`)
     expect(await screen.findByText(labels.projects.noSection)).toBeInTheDocument()
-    expect(screen.queryByPlaceholderText(labels.projects.addTask)).toBeNull()
+    await userEvent.click(screen.getByRole('link', { name: labels.editor.fillProject }))
+    expect(router.state.location.pathname).toBe(`/projets/${p.id}/modifier`)
   })
 
-  it('crée 2 sections et 3 tâches à la suite ; tout est conservé dans l’ordre', async () => {
+  it('affiche sections et tâches dans l’ordre, sans champ de saisie de tâche', async () => {
     const p = await createProject({ name: 'Ballade' })
+    const s1 = await createSection(p.id, 'Passages')
+    const s2 = await createSection(p.id, 'Page 1')
+    await createTask(s1.id, 'm. 23-30')
+    await createTask(s1.id, 'm. 45-52')
+    await createTask(s2.id, 'Lignes 3 et 4')
     renderApp(`/projets/${p.id}`)
-    const newSection = await screen.findByLabelText(labels.projects.newSection)
-    await userEvent.type(newSection, 'Passages à tempo{Enter}')
-    await userEvent.type(newSection, 'Page 1{Enter}')
-    expect(await screen.findByRole('region', { name: 'Page 1' })).toBeInTheDocument()
-
-    const add = screen.getByLabelText(labels.projects.addTaskLabel('Passages à tempo'))
-    await userEvent.type(add, 'm. 23-30{Enter}')
-    expect(add).toHaveValue('')
-    await userEvent.type(add, 'm. 45-52{Enter}')
-    await userEvent.type(
-      screen.getByLabelText(labels.projects.addTaskLabel('Page 1')),
-      'Lignes 3 et 4{Enter}',
-    )
-    await screen.findByText('Lignes 3 et 4')
-
-    cleanup() // « recharger »
-    renderApp(`/projets/${p.id}`)
-    await screen.findByText('Lignes 3 et 4')
-    expect(sectionNames()).toEqual(['Passages à tempo', 'Page 1'])
-    const first = screen.getByRole('region', { name: 'Passages à tempo' })
+    const first = await screen.findByRole('region', { name: 'Passages' })
     expect(
       within(first)
-        .getAllByRole('button', { name: /^Modifier la tâche/ })
-        .map((b) => b.textContent),
+        .getAllByRole('listitem')
+        .map((li) => li.textContent),
     ).toEqual(['m. 23-30', 'm. 45-52'])
+    expect(screen.getByRole('region', { name: 'Page 1' })).toHaveTextContent('Lignes 3 et 4')
+    expect(screen.queryByPlaceholderText(labels.projects.addTask)).toBeNull()
+    expect(screen.getByRole('link', { name: labels.projects.edit })).toHaveAttribute(
+      'href',
+      `/projets/${p.id}/modifier`,
+    )
   })
 
   it('avancement enregistré à la sortie du champ ; vidé → null', async () => {
@@ -62,28 +52,26 @@ describe('Détail projet', () => {
     expect((await db.sections.get(s.id))?.progress).toBeNull()
   })
 
-  it('modifie le libellé d’une tâche sur place ; vide = annulé', async () => {
+  it('tâches archivées : compteur et réactivation à leur place', async () => {
     const p = await createProject({ name: 'Ballade' })
     const s = await createSection(p.id, 'Page 1')
-    const t = await createTask(s.id, 'm. 23')
+    const a = await createTask(s.id, 'Lignes 1 et 2')
+    await createTask(s.id, 'Lignes 3 et 4')
+    await archiveTask(a.id)
     renderApp(`/projets/${p.id}`)
+    const section = await screen.findByRole('region', { name: 'Page 1' })
+    await userEvent.click(await within(section).findByText(labels.projects.archivedTasks(1)))
     await userEvent.click(
-      await screen.findByRole('button', { name: labels.projects.editTask('m. 23') }),
+      within(section).getByRole('button', { name: `${labels.projects.reactivate} Lignes 1 et 2` }),
     )
-    const input = screen.getByRole('textbox', { name: labels.projects.editTask('m. 23') })
-    await userEvent.clear(input)
-    await userEvent.type(input, 'm. 23-30{Enter}')
-    expect(await screen.findByText('m. 23-30')).toBeInTheDocument()
-    expect((await db.tasks.get(t.id))?.label).toBe('m. 23-30')
-
-    await userEvent.click(
-      screen.getByRole('button', { name: labels.projects.editTask('m. 23-30') }),
-    )
-    await userEvent.clear(
-      screen.getByRole('textbox', { name: labels.projects.editTask('m. 23-30') }),
-    )
-    await userEvent.tab()
-    expect((await db.tasks.get(t.id))?.label).toBe('m. 23-30')
+    expect(await screen.findByRole('status')).toHaveTextContent(labels.projects.taskReactivated)
+    await within(section).findByText('Lignes 1 et 2', { selector: 'li' })
+    expect(
+      within(section)
+        .getAllByRole('listitem')
+        .map((li) => li.textContent)
+        .slice(0, 2),
+    ).toEqual(['Lignes 1 et 2', 'Lignes 3 et 4'])
   })
 })
 
@@ -112,99 +100,5 @@ describe('Supprimer un projet', () => {
     expect(await screen.findByText(labels.projects.empty)).toBeInTheDocument()
     expect((await db.projects.get(p.id))?.deletedAt).toEqual(expect.any(Number))
     expect(await db.tasks.count()).toBe(1)
-  })
-})
-
-describe('Archiver et réactiver', () => {
-  it('archive, compte les archivées, réactive à sa place', async () => {
-    const p = await createProject({ name: 'Ballade' })
-    const s = await createSection(p.id, 'Page 1')
-    const a = await createTask(s.id, 'Lignes 1 et 2')
-    await createTask(s.id, 'Lignes 3 et 4')
-    renderApp(`/projets/${p.id}`)
-    const section = await screen.findByRole('region', { name: 'Page 1' })
-    expect(within(section).queryByText(/Tâches archivées/)).toBeNull()
-
-    await userEvent.click(
-      within(section).getByRole('button', { name: `${labels.projects.archive} Lignes 1 et 2` }),
-    )
-    expect(await screen.findByRole('status')).toHaveTextContent(labels.projects.taskArchived)
-    expect(await within(section).findByText(labels.projects.archivedTasks(1))).toBeInTheDocument()
-    expect((await db.tasks.get(a.id))?.status).toBe('archived')
-
-    await userEvent.click(within(section).getByText(labels.projects.archivedTasks(1)))
-    await userEvent.click(
-      within(section).getByRole('button', { name: `${labels.projects.reactivate} Lignes 1 et 2` }),
-    )
-    expect(await screen.findByText(labels.projects.taskReactivated)).toBeInTheDocument()
-    await screen.findByRole('button', { name: labels.projects.editTask('Lignes 1 et 2') })
-    expect(within(section).queryByText(/Tâches archivées/)).toBeNull()
-    const labelsInOrder = within(section)
-      .getAllByRole('button', { name: /^Modifier la tâche/ })
-      .map((b) => b.textContent)
-    expect(labelsInOrder).toEqual(['Lignes 1 et 2', 'Lignes 3 et 4'])
-  })
-})
-
-describe('Supprimer une tâche ou une section sans temps (lot 3)', () => {
-  it('tâche sans temps : ✕ en modifiant le libellé la supprime', async () => {
-    const p = await createProject({ name: 'Ballade' })
-    const s = await createSection(p.id, 'Page 1')
-    const t = await createTask(s.id, 'Lignes 1 et 2')
-    renderApp(`/projets/${p.id}`)
-    await userEvent.click(
-      await screen.findByRole('button', { name: labels.projects.editTask('Lignes 1 et 2') }),
-    )
-    await userEvent.click(
-      screen.getByRole('button', { name: labels.projects.deleteTask('Lignes 1 et 2') }),
-    )
-    expect(await screen.findByRole('status')).toHaveTextContent(labels.projects.taskDeleted)
-    await vi.waitFor(() => expect(screen.queryByText('Lignes 1 et 2')).toBeNull())
-    expect(await db.tasks.get(t.id)).toBeUndefined()
-  })
-
-  it('tâche avec du temps : refus avec un message, la tâche reste', async () => {
-    const p = await createProject({ name: 'Ballade' })
-    const s = await createSection(p.id, 'Page 1')
-    const t = await createTask(s.id, 'Lignes 1 et 2')
-    await addManualEntry(t.id, '2026-11-09', 600)
-    renderApp(`/projets/${p.id}`)
-    await userEvent.click(
-      await screen.findByRole('button', { name: labels.projects.editTask('Lignes 1 et 2') }),
-    )
-    await userEvent.click(
-      screen.getByRole('button', { name: labels.projects.deleteTask('Lignes 1 et 2') }),
-    )
-    expect(await screen.findByRole('status')).toHaveTextContent(labels.projects.taskHasTime)
-    expect(await db.tasks.get(t.id)).toBeDefined()
-  })
-
-  it('section : confirmation avec le nombre de tâches, puis suppression ; refus si du temps', async () => {
-    const p = await createProject({ name: 'Ballade' })
-    const s1 = await createSection(p.id, 'Page 2')
-    await createTask(s1.id, 'a')
-    await createTask(s1.id, 'b')
-    const s2 = await createSection(p.id, 'Coda')
-    const c = await createTask(s2.id, 'c')
-    await addManualEntry(c.id, '2026-11-09', 600)
-    renderApp(`/projets/${p.id}`)
-
-    await userEvent.click(
-      await screen.findByRole('button', { name: labels.projects.deleteSection('Coda') }),
-    )
-    expect(await screen.findByRole('status')).toHaveTextContent(labels.projects.sectionHasTime)
-    expect(screen.queryByRole('dialog')).toBeNull()
-
-    await userEvent.click(
-      screen.getByRole('button', { name: labels.projects.deleteSection('Page 2') }),
-    )
-    const dialog = await screen.findByRole('dialog', {
-      name: labels.projects.deleteSectionTitle('Page 2'),
-    })
-    expect(dialog).toHaveTextContent(labels.projects.deleteSectionText(2))
-    await userEvent.click(within(dialog).getByRole('button', { name: labels.projects.delete }))
-    await vi.waitFor(() => expect(screen.queryByRole('region', { name: 'Page 2' })).toBeNull())
-    expect(await db.sections.get(s1.id)).toBeUndefined()
-    expect(screen.getByRole('region', { name: 'Coda' })).toBeInTheDocument()
   })
 })

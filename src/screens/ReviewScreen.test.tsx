@@ -62,9 +62,7 @@ describe('Revue de semaine', () => {
     await userEvent.tab()
     cleanup()
     renderApp(`/projets/${p.id}`)
-    expect(
-      await screen.findByRole('button', { name: labels.projects.editTask('Mains ensemble') }),
-    ).toBeInTheDocument()
+    expect(await screen.findByText('Mains ensemble', { selector: 'li' })).toBeInTheDocument()
     expect(screen.getByLabelText(labels.projects.progressLabel('Passages à tempo'))).toHaveValue(
       'Tempo 80',
     )

@@ -6,32 +6,11 @@ import { useToast } from '../components/Toast'
 import { ui } from '../components/ui'
 import { formatDayMonth } from '../data/dates'
 import { useProject, useSectionsWithTasks } from '../data/hooks'
-import { createSection, deleteProject } from '../data/projects'
+import { deleteProject } from '../data/projects'
 import type { Project } from '../data/types'
 import { labels } from '../labels'
-import { ArchiveButton, ArchivedTasks } from './projects/Archiving'
-import { ProjectFormSheet } from './projects/ProjectFormSheet'
+import { ArchivedTasks } from './projects/Archiving'
 import { SectionCard } from './projects/SectionCard'
-
-/** Champ « + Nouvelle section » : Entrée pour valider. */
-function NewSectionInput({ projectId }: { projectId: string }) {
-  const [value, setValue] = useState('')
-  return (
-    <input
-      className={ui.input}
-      aria-label={labels.projects.newSection}
-      placeholder={labels.projects.newSection}
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      onKeyDown={async (e) => {
-        if (e.key !== 'Enter' || value.trim() === '') return
-        // Vider tout de suite : on peut enchaîner la saisie suivante sans attendre la base.
-        setValue('')
-        await createSection(projectId, value)
-      }}
-    />
-  )
-}
 
 function projectSubtitle(project: Project) {
   return [
@@ -44,12 +23,14 @@ function projectSubtitle(project: Project) {
     .join(' · ')
 }
 
-/** Détail d'un projet (proto `V.projet`). */
+/**
+ * Détail d'un projet (proto `V.projet`). La saisie des sections et tâches se fait dans
+ * l'écran d'édition (« Modifier », lot 5) ; ici : consultation, avancement, réactivation.
+ */
 export function ProjectDetailScreen() {
   const { id } = useParams()
   const data = useProject(id)
   const sections = useSectionsWithTasks(id)
-  const [editing, setEditing] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const navigate = useNavigate()
   const toast = useToast()
@@ -64,19 +45,17 @@ export function ProjectDetailScreen() {
   }
 
   const { project } = data
+  const chip = `${ui.chip} inline-flex items-center`
   return (
     <Screen title={project.name} subtitle={projectSubtitle(project)} back="/projets">
       <div className="mt-1 mb-3.5 flex flex-wrap gap-2">
-        <button type="button" className={ui.chip} onClick={() => setEditing(true)}>
+        <Link to={`/projets/${project.id}/modifier`} className={chip}>
           {labels.projects.edit}
-        </button>
-        <Link
-          to={`/projets/${project.id}/planning`}
-          className={`${ui.chip} inline-flex items-center`}
-        >
+        </Link>
+        <Link to={`/projets/${project.id}/planning`} className={chip}>
           {labels.projects.planning}
         </Link>
-        <Link to={`/projets/${project.id}/bilan`} className={`${ui.chip} inline-flex items-center`}>
+        <Link to={`/projets/${project.id}/bilan`} className={chip}>
           {labels.projects.report}
         </Link>
         <button type="button" className={ui.chipDanger} onClick={() => setConfirmDelete(true)}>
@@ -84,24 +63,24 @@ export function ProjectDetailScreen() {
         </button>
       </div>
 
-      {sections?.length === 0 && <p className={`${ui.fact} mb-3`}>{labels.projects.noSection}</p>}
+      {sections?.length === 0 && (
+        <>
+          <p className={`${ui.fact} mb-3`}>{labels.projects.noSection}</p>
+          <Link
+            to={`/projets/${project.id}/modifier`}
+            className={`${ui.secondary} block text-center`}
+          >
+            {labels.editor.fillProject}
+          </Link>
+        </>
+      )}
       {sections?.map((data) => (
         <SectionCard
           key={data.section.id}
           data={data}
-          taskAction={(task) => <ArchiveButton task={task} />}
           footer={<ArchivedTasks tasks={data.archivedTasks} />}
         />
       ))}
-      <NewSectionInput projectId={project.id} />
-
-      {editing && (
-        <ProjectFormSheet
-          project={project}
-          onClose={() => setEditing(false)}
-          onSaved={() => setEditing(false)}
-        />
-      )}
 
       <Sheet
         open={confirmDelete}
