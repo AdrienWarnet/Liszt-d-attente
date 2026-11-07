@@ -13,7 +13,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | 1.3 | Déploiement GitHub Pages | Technique | CC + PO | 1.2 | Fait |
 | 1.4 | Base de données et utilitaires date / durée | Donnée | CC | 1.1 | Fait |
 | 1.5 | Navigation et mise en page mobile | Front | CC | 1.1 | Fait |
-| 1.6 | Valider l'installation sur le téléphone d'Adele | Décision | PO + Adele | 1.3 | À faire |
+| 1.6 | Valider l'installation sur le téléphone d'Adele | Décision | PO + Adele | 1.3 | Fait |
 | 1.7 | Direction artistique verte (reprise du proto) | Front | CC | 1.5 | Fait |
 
 ## Epic 2 — Projets, sections et tâches (MVP)
@@ -126,3 +126,4 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | 07/11/2026 | Ajouts au proto gardés : modifier un projet, modifier le libellé d'une tâche. Abandonnés : réordonner les sections, déplacer une tâche, « Annuler » après archivage, recherche de tâches, modifier un ajout manuel, lien « Aujourd'hui » | Choix PO (suivre le proto) | Epics 2, 3, 4 |
 | 07/11/2026 | Bouton « Supprimer » en rouge brique `danger` (action destructive, distinct du rouge `over`) | Choix PO | 2.3, 2.4 |
 | 07/11/2026 | Ajout manuel : jour choisi parmi les 14 derniers jours | Choix PO | 4.6 |
+| 07/11/2026 | Téléphone cible : Android, écran de 360 à 412 px de large (Adele : Redmi Note 9 ou Honor, modèle exact inconnu ; PO : Nothing Phone 3). Installation validée sur le téléphone d'Adele (1.6) | Info PO | Tous les écrans |
