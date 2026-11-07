@@ -27,6 +27,14 @@ export function MoreScreen() {
           </Link>
         </li>
         <li>
+          <Link to="/ajout-manuel" className={row}>
+            {labels.session.manualAdd}
+            <span className="text-muted">
+              <ChevronIcon />
+            </span>
+          </Link>
+        </li>
+        <li>
           <ThemePicker />
         </li>
         <li className={row}>

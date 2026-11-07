@@ -517,3 +517,18 @@ export async function getBannerState(now: Timestamp = Date.now()): Promise<Banne
   const first = (await db.sessionTasks.where('sessionId').equals(session.id).sortBy('order'))[0]
   return { sessionId: session.id, running, resumeTaskId: last?.taskId ?? first?.taskId ?? null }
 }
+
+// ---------- Ajouts manuels récents (4.6) ----------
+
+/** Derniers ajouts manuels, du plus récent au plus ancien (ordre de saisie). */
+export async function listManualEntries(
+  limit = 20,
+): Promise<{ entry: ManualEntry; context: TaskContext }[]> {
+  const entries = (await db.manualEntries.toArray())
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .slice(0, limit)
+  const contexts = await taskContexts(entries.map((e) => e.taskId))
+  return entries
+    .filter((e) => contexts.has(e.taskId))
+    .map((entry) => ({ entry, context: contexts.get(entry.taskId)! }))
+}
