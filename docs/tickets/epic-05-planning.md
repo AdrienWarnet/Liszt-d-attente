@@ -40,13 +40,15 @@ En tant qu'Adele, je veux voir et ajuster sur quelles semaines je travaille chaq
 **Contexte technique**
 Route `/projets/:id/planning`, accessible depuis le détail projet (2.3). Fonctions 5.1 et `updateSection` (avancement). Libellés provisoires : **Planning**, **Prévu initial**, **Prévu revu** ; libellé **Avancement**. Remplace l'onglet PLANNING de l'Excel.
 
-**Référence visuelle**
-- Grille défilant horizontalement : colonnes = semaines (« 9 nov. », semaine courante surlignée) ; lignes = sections (nom figé à gauche).
-- Chaque section occupe deux mini-lignes : **Prévu initial** (cases grisées, non modifiables) et **Prévu revu** (cases colorées, taper une case ajoute / retire la semaine).
-- Tant qu'une section n'a jamais été placée, une seule ligne : taper une case crée le prévu initial (message une fois : « Ce premier placement sera conservé comme prévu initial. »).
-- Indicateur « modifié » sur les sections dont le revu diffère de l'initial.
-- Sous la grille, pour chaque section : champ **Avancement** (texte libre).
-- Lisible sur 375 px : nom de section tronqué avec « … », colonnes ≥ 44 px.
+**Référence visuelle (proto, `V.planning`)**
+- En-tête : bouton retour, « Planning », sous-titre = nom du projet.
+- Légende : « Prévu initial » (pastille `line`), « Prévu revu » (pastille `felt`).
+- Grille défilant horizontalement : colonnes = semaines (« 9 nov », semaine courante en vert) ; lignes = sections (nom figé à gauche, tronqué avec « … »).
+- Chaque section placée occupe deux mini-lignes : « initial » (cases grises, non modifiables) et « revu » (cases vertes, taper une case ajoute / retire la semaine).
+- Section jamais placée : une seule ligne « à placer » ; taper une case crée le prévu initial (message bref « Premier placement gardé comme prévu initial »).
+- Phrase sous la grille : « Touche une case pour placer ou retirer une semaine. Le premier placement d'une section est gardé comme prévu initial. »
+- Libellé « Avancement » puis, pour chaque section : nom + étiquette « modifié » si le revu diffère de l'initial, zone de texte « Où en est cette section ? ».
+- Le proto dessine des cases de 46 × 28 px : garder ce dessin mais une zone tactile ≥ 44 px (règle `CLAUDE.md`).
 
 **Definition of Done**
 - Placer une section sur 2 semaines, recharger : prévu initial et revu affichent les 2 semaines.

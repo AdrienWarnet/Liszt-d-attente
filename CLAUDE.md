@@ -79,17 +79,26 @@ Les noms marqués *(provisoire)* sont à valider avec Adele : les centraliser da
 | Planning macro | Planning *(provisoire)* | Placement des sections sur les semaines. |
 | Prévu initial | Prévu initial *(provisoire)* | Premier placement, figé. |
 | Prévu revu | Prévu revu *(provisoire)* | Placement modifié. |
-| Bilan | Bilan | Récap texte, prévu vs réel. |
+| Bilan | Bilan | Tableau de bord prévu vs réel (chiffres clés, barres, graphiques, détail dépliable). |
 | Revue de semaine | Revue de semaine *(provisoire)* | Archiver, ajouter des tâches, mettre à jour l'avancement. |
 | Archivage | Archiver / Réactiver | Retrait réversible de la liste active. |
 | Mode concentration | Mode concentration *(provisoire)* | Chrono plein écran (P2). |
 | Photo de cahier | Photo de cahier *(provisoire)* | Photo rattachée à un projet (P2). |
 | Note de cours | Note de cours *(provisoire)* | Notes après un cours avec Jenifer (P2). |
 
-Ton de l'interface : sobre, tutoiement, aucun message culpabilisant. Un dépassement est un **constat** (« 1:20 au-dessus du budget »), jamais une alerte rouge, une popup ou un blocage.
+Ton de l'interface : sobre, tutoiement, aucun message culpabilisant. Un dépassement du réel est un **constat** neutre (« 1:20 au-dessus du budget », couleur `ink`), jamais une popup ni un blocage. **Seule exception** : un temps **prévu** supérieur au budget (jour ou semaine) est signalé en rouge `over` avec « ▲ » et une phrase (R12).
+
+## Design
+- **Référence** : `docs/design/proto-piano.html` (prototype cliquable validé par le PO le 07/11/2026, à ouvrir dans un navigateur en largeur téléphone). Toute UI suit ce proto : structure d'écran, composants, libellés, comportements. Le proto est une maquette : ne pas copier son code, reproduire son rendu en React + Tailwind avec `src/data/`. Si le proto contredit une règle de ce fichier ou de `docs/brief.md`, la règle gagne et l'écart est signalé au PO.
+- **Tokens** (Tailwind v4 : bloc `@theme` de `src/index.css`, valeurs exactes du `:root` du proto, clair et sombre via `prefers-color-scheme`) : fond `screen`, encre `ink`, `muted`, `line`, accent vert feutre `felt` + `felt-soft`, `ebony` et `key` (touches du clavier des jours), voile `scrim`, couleurs projets `c0` à `c5` (`c0`–`c2` du proto ; `c3` violet `#7D5BD0` / sombre `#9277E0`, `c4` ocre `#C48A1C` / `#D39B2E`, `c5` rose `#C94F9A` / `#D865AA`, ajoutées par le PO le 07/11/2026), rouge `over` + `over-soft` (réservé au prévu au-dessus du budget), rouge brique `danger` `#A2463A` (bouton « Supprimer » uniquement).
+- **Couleur d'un projet** : attribuée par ordre de création du projet (projets supprimés compris), modulo 6, jamais recalculée selon son rang dans une liste affichée. Calculée dans `src/data/`. Les projets sont listés par date de création.
+- **Typo** : Instrument Serif pour les titres d'écran et de feuille, Manrope pour tout le reste (polices embarquées, hors ligne). Chiffres en `tabular-nums`. Durées affichées `h:mm` (`h:mm:ss` pour un chrono en cours), arrondies à la minute (décision 1.4 ; le proto tronque, la règle gagne).
+- **Composants récurrents** (dans `src/components/`, réutilisés partout) : en-tête d'écran (titre serif, sous-titre, bouton retour sur les sous-écrans), en-tête de groupe projet (pastille de couleur + nom), `DurationInput` (fond `felt-soft`, texte `felt`, « — » si vide), barre d'avancement réel / référence, tuile chiffre clé, panneau, feuille modale en bas d'écran (titre serif, Annuler / action), message bref (toast), bandeau de chrono global, puces, navigation ‹ semaine ›.
+- **Listes de tâches** (session, prévu aujourd'hui, jour, ajout de tâches) : **groupées par projet** (en-tête pastille + nom), section en petit au-dessus du libellé de la tâche.
+- Zones tactiles ≥ 44 px même quand le proto dessine plus petit (ex. cases du planning).
 
 ## Hors périmètre (ne pas implémenter sans ticket)
-Authentification, multi-utilisateur, synchro multi-appareils, serveur, OCR / IA, enregistrement audio, commentaire de session, graphiques, notifications push.
+Authentification, multi-utilisateur, synchro multi-appareils, serveur, OCR / IA, enregistrement audio, commentaire de session, graphiques autres que ceux du bilan (SVG maison, pas de librairie), notifications push.
 
 ## Façon de travailler sur un ticket
 1. Lire le ticket et ses dépendances dans `docs/suivi.md`. Si une dépendance n'est pas `Fait`, s'arrêter et le signaler.

@@ -1,0 +1,657 @@
+<title>Proto app Piano</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout : un téléphone centré, 5 onglets, écrans empilés avec retour, feuilles modales en bas */
+:root{
+  --page:#E9ECEA; --screen:#FBFCFB; --ink:#1B2421; --muted:#68746F; --line:#DCE2DF;
+  --felt:#2E5E4E; --felt-soft:#E1ECE7; --key:#FFFFFF; --ebony:#1E2522; --frame:#1A1F1D; --scrim:rgba(20,28,25,.45);
+  --serif:"Instrument Serif",Georgia,serif; --sans:"Manrope",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --page:#0F1312; --screen:#161B19; --ink:#E7ECE9; --muted:#93A09A; --line:#2A3330;
+  --felt:#7DBBA4; --felt-soft:#1F2D28; --key:#212826; --ebony:#E7ECE9; --frame:#000; --scrim:rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --page:#0F1312; --screen:#161B19; --ink:#E7ECE9; --muted:#93A09A; --line:#2A3330;
+  --felt:#7DBBA4; --felt-soft:#1F2D28; --key:#212826; --ebony:#E7ECE9; --frame:#000; --scrim:rgba(0,0,0,.6); color-scheme:dark}
+html,body{height:100%}
+body{background:var(--page);color:var(--ink);font-family:var(--sans);font-size:15px;display:flex;justify-content:center;align-items:center;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px;box-sizing:border-box}
+*{box-sizing:border-box}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer;padding:0}
+:focus-visible{outline:2px solid var(--felt);outline-offset:2px}
+.phone{width:390px;max-width:100%;height:min(800px,calc(100vh - 48px));background:var(--screen);border:10px solid var(--frame);
+  border-radius:46px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+@media (max-width:440px){body{padding:0}.phone{border:0;border-radius:0;height:100%;width:100%}}
+.status{display:flex;justify-content:space-between;padding:12px 26px 4px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.head{padding:6px 20px 10px;display:flex;align-items:flex-end;gap:10px}
+.head .back{width:40px;height:40px;margin-left:-10px;border-radius:50%;display:grid;place-items:center;flex:none}
+.head h1{font-family:var(--serif);font-weight:400;font-size:32px;margin:0;line-height:1.1;text-wrap:balance}
+.head p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.scroll{flex:1;overflow-y:auto;padding:0 20px 24px;min-height:0}
+/* bandeau chrono */
+.band{margin:0 20px 10px;display:flex;align-items:center;gap:10px;background:var(--felt);color:var(--screen);border-radius:14px;padding:8px 8px 8px 14px;font-size:13px;cursor:pointer}
+.band span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.band b{font-variant-numeric:tabular-nums}
+.band button{width:36px;height:36px;border-radius:50%;background:var(--screen);color:var(--felt);display:grid;place-items:center;flex:none}
+/* éléments communs */
+.card{border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin-bottom:12px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;gap:12px}
+.v{font-variant-numeric:tabular-nums;font-weight:600}
+.lbl{font-size:13px;color:var(--muted);margin:18px 0 6px;font-weight:600}
+.fact{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.4}
+.link{color:var(--felt);font-weight:600;font-size:14px;padding:10px 0;text-align:left}
+.dur-in{width:76px;text-align:right;padding:8px 10px;border-radius:10px;border:0;background:var(--felt-soft);color:var(--felt);font-weight:700;font-variant-numeric:tabular-nums}
+.dur-in::placeholder{color:var(--felt);opacity:.6}
+.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--screen)}
+textarea.txt{resize:vertical;min-height:44px;font-size:14px}
+.primary{width:100%;padding:15px;border-radius:14px;background:var(--ink);color:var(--screen);font-weight:700}
+.primary:disabled{opacity:.35;cursor:default}
+.secondary{width:100%;padding:14px;border:1.5px dashed var(--line);border-radius:14px;color:var(--muted);font-weight:600}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 14px}
+.chip{padding:8px 14px;border-radius:99px;border:1px solid var(--line);font-size:13px;font-weight:600}
+.chip.danger{color:#A2463A;border-color:currentColor}
+.crumb{font-size:12px;color:var(--muted)}
+.muted{color:var(--muted)}
+.check{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.check input{width:22px;height:22px;accent-color:var(--felt);flex:none}
+.check div{flex:1;min-width:0}
+.group{font-weight:700;font-size:14px;margin:16px 0 2px}
+.sect{font-size:12px;color:var(--muted);margin-top:8px}
+/* session */
+.start{width:100%;aspect-ratio:2.2;max-width:100%;border-radius:22px;background:var(--felt);color:var(--screen);font-family:var(--serif);font-size:30px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;margin:6px 0 4px}
+.start small{font-family:var(--sans);font-size:13px;opacity:.8}
+.total{display:flex;align-items:baseline;justify-content:space-between;padding:4px 0 14px;border-bottom:1px solid var(--line)}
+.total strong{font-size:30px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.total small{color:var(--muted)}
+.task{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);position:relative}
+.task .t{flex:1;min-width:0}
+.task .name{font-weight:600;margin-top:2px}
+.task .dur{font-variant-numeric:tabular-nums;font-weight:600;color:var(--muted)}
+.task.on .dur{color:var(--felt)}
+.task.on::before{content:"";position:absolute;left:-20px;top:12px;bottom:12px;width:3px;background:var(--felt);border-radius:0 3px 3px 0}
+.play{width:56px;height:56px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;flex:none}
+.task.on .play{background:var(--felt);border-color:var(--felt);color:var(--screen)}
+/* semaine */
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.nav button.arrow{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center}
+.nav button.arrow:disabled{opacity:.3}
+.keys{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:4px 0 14px}
+.k{background:var(--key);border:1px solid var(--line);border-radius:0 0 10px 10px;height:92px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:8px;font-size:12px;gap:2px;position:relative}
+.k b{font-size:15px}
+.k i{font-style:normal;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.k.today::after{content:"";position:absolute;top:8px;width:6px;height:6px;border-radius:50%;background:var(--felt)}
+.k[aria-pressed="true"]{background:var(--ebony);color:var(--screen);border-color:var(--ebony)}
+.k[aria-pressed="true"] i{color:inherit;opacity:.7}
+.plan{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+.plan>div{flex:1;min-width:0}
+.x{width:32px;height:32px;border-radius:50%;color:var(--muted);flex:none}
+/* projets */
+.pcard{width:100%;text-align:left;border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:10px;display:block}
+.pcard strong{font-size:17px;display:block}
+.trow{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
+.trow span{flex:1;min-width:0}
+.mini{font-size:12px;color:var(--muted);font-weight:600;padding:6px 8px;border-radius:8px}
+.mini.go{color:var(--felt)}
+.archived{color:var(--muted);text-decoration:line-through}
+details.arch summary{font-size:13px;color:var(--muted);padding:8px 0;cursor:pointer}
+/* planning */
+.grid-wrap{overflow-x:auto;margin:0 -20px;padding:0 20px}
+table.grid{border-collapse:separate;border-spacing:3px;font-size:12px}
+.grid th{font-weight:600;color:var(--muted);text-align:center;min-width:46px;padding:4px 0}
+.grid th.cur{color:var(--felt)}
+.grid td.name{position:sticky;left:0;background:var(--screen);padding-right:8px;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;font-size:13px}
+.grid td.kind{color:var(--muted);font-size:11px;padding-right:6px;white-space:nowrap}
+.cell{width:46px;height:28px;border-radius:7px;border:1px solid var(--line);display:block}
+.cell.ini{background:var(--line);border-color:var(--line)}
+.cell.rev{background:var(--felt);border-color:var(--felt)}
+.cell.fixed{cursor:default}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin:10px 0}
+.legend i{display:inline-block;width:14px;height:10px;border-radius:3px;margin-right:5px;vertical-align:middle}
+.tag{font-size:11px;font-weight:700;color:var(--felt);background:var(--felt-soft);padding:2px 7px;border-radius:99px;margin-left:6px}
+/* bilan */
+.recap{font-variant-numeric:tabular-nums;line-height:1.5}
+.recap h2{font-family:var(--serif);font-weight:400;font-size:22px;margin:20px 0 4px}
+.line{display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.line span:last-child{color:var(--muted);text-align:right}
+.big{font-size:17px;font-weight:600}
+.recap details{border-top:1px solid var(--line);padding:8px 0}
+.recap summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:10px;font-weight:600;font-size:14px}
+.recap summary::-webkit-details-marker{display:none}
+.sub{padding-left:14px;font-size:13px;color:var(--muted);padding-top:4px}
+.sub .line span:first-child{color:var(--ink)}
+.empty{color:var(--muted);text-align:center;padding:40px 10px;line-height:1.5}
+.live{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--felt);margin-right:6px;vertical-align:middle}
+/* groupes par projet, tableau de bord */
+:root{--over:#d03b3b;--over-soft:#FBE4E2;--c0:#2a78d6;--c1:#eb6834;--c2:#1baf7a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--over-soft:#3A1F1E;--c0:#3987e5;--c1:#d95926;--c2:#199e70}}
+:root[data-theme="dark"]{--over-soft:#3A1F1E;--c0:#3987e5;--c1:#d95926;--c2:#199e70}
+.pg{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin:16px 0 0}
+.pg i{width:10px;height:10px;border-radius:3px;flex:none}
+.pg+.task,.pg+.plan{border-top:0}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 10px}
+.tile{background:var(--felt-soft);border-radius:14px;padding:10px 12px;min-width:0}
+.tile span{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.tile b{display:block;font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px;white-space:nowrap}
+.tile small{font-size:11px;color:var(--muted)}
+.prog{height:8px;border-radius:4px;background:var(--line);position:relative;overflow:hidden}
+.prog i{position:absolute;left:0;top:0;bottom:0;background:var(--felt);border-radius:4px}
+.prog.over i{background:var(--ink)}
+.panel{border:1px solid var(--line);border-radius:16px;padding:14px 14px 10px;margin-bottom:12px}
+.panel h3{margin:0 0 2px;font-size:15px}
+.panel .fact{margin:0 0 8px}
+.chart svg{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-size:10px;font-family:var(--sans)}
+.chart .hl{fill:var(--ink);font-weight:700}
+.chart .grid-l{stroke:var(--line);stroke-width:1}
+.chart .bar{fill:var(--felt)}
+.chart .bud{stroke:var(--ink);stroke-width:2;stroke-linecap:round}
+.chart .hit{fill:transparent;cursor:pointer}
+.chart .hit:hover+.dummy,.chart .hit:focus{outline:none}
+.tip{font-size:13px;min-height:20px;font-variant-numeric:tabular-nums;margin-bottom:4px}
+.legend2{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:6px}
+.legend2 i{display:inline-block;width:12px;height:10px;border-radius:3px;background:var(--felt);margin-right:5px;vertical-align:middle}
+.legend2 i.l{height:2px;background:var(--ink);border-radius:1px}
+.legend2 i.o{background:none;border:1.5px solid var(--muted)}
+.hb{padding:10px 0;border-top:1px solid var(--line)}
+.hb:first-of-type{border-top:0}
+.hb summary{list-style:none;cursor:pointer}
+.hb summary::-webkit-details-marker{display:none}
+.hb .top{display:flex;justify-content:space-between;gap:10px;font-size:14px;margin-bottom:6px}
+.hb .top b{font-weight:700}
+.hb .top span:last-child{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.track{height:12px;position:relative;border-radius:4px;background:var(--felt-soft)}
+.track .pv{position:absolute;top:-2px;bottom:-2px;left:0;border:1.5px solid var(--muted);border-radius:5px}
+.track .rl{position:absolute;top:0;bottom:0;left:0;border-radius:4px}
+.hb .sub{padding-top:8px}
+.chipset{display:flex;flex-wrap:wrap;gap:6px}
+.pchip{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:99px;border:1px solid var(--line);font-size:12px}
+.pchip i{width:8px;height:8px;border-radius:2px}
+.drow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.drow:first-child{border-top:0}
+.drow>button{flex:1;min-width:0;text-align:left;display:flex;flex-direction:column;gap:5px}
+.drow .dn{display:flex;justify-content:space-between;font-size:14px;font-weight:600}
+.drow .dn small{font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}
+.drow.today .dn span::after{content:" · aujourd'hui";color:var(--felt);font-weight:600;font-size:12px}
+.chart .gb{fill:var(--felt-soft);stroke:var(--felt);stroke-width:1;stroke-dasharray:3 2}
+.chart .exc{fill:var(--ink)}
+.chart g.off{opacity:.45}
+.tipbox{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;background:var(--felt-soft);border-radius:12px;padding:8px 12px;margin:8px 0 6px;font-size:13px;font-variant-numeric:tabular-nums}
+.tipbox b{width:100%;font-size:13px}
+.tipbox strong{font-size:16px}
+.tipbox em{font-style:normal;color:var(--muted);font-size:12px}
+.legend2 i.g{background:var(--felt-soft);border:1px dashed var(--felt)}
+.legend2 i.e{background:var(--ink)}
+.over{color:var(--over);font-weight:700}
+.split{display:flex;gap:2px;height:14px;border-radius:5px;overflow:hidden;margin:4px 0 6px}
+.split span{height:100%}
+.splitleg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted);margin-bottom:6px}
+.splitleg i,.pn i,.pl-p i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.splitleg b{color:var(--ink);font-variant-numeric:tabular-nums}
+.prj{padding:14px 0 4px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.prj-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.pn{font-size:15px;min-width:0}
+.pv{white-space:nowrap;font-variant-numeric:tabular-nums}
+.pv strong{font-size:20px}
+.pv small{color:var(--muted);font-size:12px}
+.secs{display:flex;flex-direction:column;gap:6px;margin:4px 0 6px}
+.srow{display:grid;grid-template-columns:minmax(0,1.3fr) 1fr auto;align-items:center;gap:10px;font-size:13px}
+.srow span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb{height:6px;border-radius:3px;background:var(--line);position:relative;overflow:hidden}
+.sb i{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.tk summary{font-size:13px;color:var(--felt);font-weight:600;cursor:pointer;padding:4px 0}
+.tk .line{padding:6px 0;border-top:1px solid var(--line);font-size:13px}
+.pl-p{font-size:12px;color:var(--muted);margin:10px 0 6px}
+.pl-p:first-of-type{margin-top:6px}
+.dur-in.tot{display:inline-block;flex:none}
+.dur-in.tot.bad{background:var(--over-soft);color:var(--over);box-shadow:inset 0 0 0 1.5px var(--over)}
+/* plus */
+.menu button{width:100%;text-align:left;padding:16px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;font-weight:600}
+.menu button:disabled{color:var(--muted);cursor:default}
+/* onglets */
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);padding:6px 4px 14px;background:var(--screen)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--muted);padding:6px 0;min-height:48px}
+.tab svg{width:22px;height:22px}
+.tab[aria-current="page"]{color:var(--felt);font-weight:700}
+/* feuille */
+.scrim{position:absolute;inset:0;background:var(--scrim);display:flex;align-items:flex-end;z-index:5}
+.sheet{background:var(--screen);width:100%;max-height:86%;border-radius:22px 22px 0 0;display:flex;flex-direction:column}
+.sheet header{padding:10px 20px 6px;display:flex;justify-content:space-between;align-items:center}
+.sheet header h2{font-family:var(--serif);font-weight:400;font-size:24px;margin:0}
+.sheet .body{overflow-y:auto;padding:0 20px 8px;min-height:0}
+.sheet footer{padding:10px 20px 20px;display:flex;gap:10px}
+.sheet footer button{flex:1}
+.ghost{padding:15px;border-radius:14px;border:1px solid var(--line);font-weight:700}
+.toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--screen);padding:10px 16px;border-radius:12px;font-size:13px;white-space:nowrap;z-index:6}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .2s ease-out}@keyframes up{from{transform:translateY(30px);opacity:.5}}}
+</style>
+
+<div class="phone" id="phone">
+  <div class="status"><span id="clock"></span><span>82 %</span></div>
+  <header class="head" id="head"></header>
+  <div class="band" id="band" hidden></div>
+  <main class="scroll" id="view"></main>
+  <nav class="tabs" id="tabs"></nav>
+  <div id="sheetHost"></div>
+  <div class="toast" id="toast" hidden></div>
+</div>
+
+<script>
+/* ===== utilitaires ===== */
+const pad=n=>String(n).padStart(2,"0");
+const iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const DN=["dim.","lun.","mar.","mer.","jeu.","ven.","sam."],DL=["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"],MN=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+const W=["2026-11-02","2026-11-09","2026-11-16","2026-11-23","2026-11-30","2026-12-07"];
+const CUR=1, TODAY="2026-11-09";
+const dt=s=>new Date(s+"T12:00");
+const days=wi=>[...Array(7)].map((_,i)=>{const d=dt(W[wi]);d.setDate(d.getDate()+i);return iso(d)});
+const dShort=s=>{const d=dt(s);return DN[d.getDay()]+" "+d.getDate()};
+const dLong=s=>{const d=dt(s);return DN[d.getDay()]+" "+d.getDate()+" "+MN[d.getMonth()]};
+const wLab=wi=>{const d=dt(W[wi]);return "Semaine du "+d.getDate()+" "+MN[d.getMonth()]};
+const wShort=wi=>{const d=dt(W[wi]);return d.getDate()+" "+MN[d.getMonth()].replace(".","")};
+const fm=s=>s==null?"—":Math.floor(s/3600)+":"+pad(Math.floor(s%3600/60));
+const fs=s=>{s=Math.floor(s);return Math.floor(s/3600)+":"+pad(Math.floor(s%3600/60))+":"+pad(s%60)};
+const parse=v=>{v=String(v).trim().toLowerCase();if(!v)return null;let m=v.match(/^(\d+)\s*[:h]\s*(\d{0,2})$/);if(m)return(+m[1])*3600+(+(m[2]||0))*60;m=v.match(/^(\d+)$/);return m?(+m[1])*60:undefined};
+const sum=a=>a.reduce((t,v)=>v==null?t:(t||0)+v,null);
+const gap=(real,ref,word)=>{if(real==null||ref==null)return"";const d=real-ref;if(Math.abs(d)<60)return"pile dans le "+word;return fm(Math.abs(d))+(d>0?" au-dessus du ":" sous le ")+word};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let uid=100;const nid=p=>p+(uid++);
+
+/* ===== données fictives ===== */
+const D={
+ projects:[{id:"p1",name:"Ballade n°1",start:"2026-11-02",end:null,deleted:false},{id:"p2",name:"Déchiffrage",start:null,end:null,deleted:false},{id:"p3",name:"Sonate en do",start:"2026-10-12",end:null,deleted:true}],
+ sections:[
+  {id:"s1",pid:"p1",name:"Passages à tempo",progress:"Tempo 80 atteint sur m. 23-30",ini:[0,1],rev:[0,1,2]},
+  {id:"s2",pid:"p1",name:"Page 1",progress:null,ini:[1],rev:[1]},
+  {id:"s3",pid:"p1",name:"Page 2",progress:null,ini:[2,3],rev:[3,4]},
+  {id:"s4",pid:"p2",name:"Clementi",progress:"Lecture à vue mains ensemble",ini:[],rev:[]},
+  {id:"s5",pid:"p2",name:"Bach",progress:null,ini:[],rev:[]},
+  {id:"s6",pid:"p3",name:"Mouvement 2",progress:null,ini:[],rev:[]}],
+ tasks:[
+  {id:"t1",sid:"s1",label:"m. 23-30 main gauche",arch:false},{id:"t2",sid:"s1",label:"m. 45-52",arch:false},{id:"t3",sid:"s1",label:"Coda, mains ensemble",arch:false},
+  {id:"t4",sid:"s2",label:"Lignes 3 et 4, doigtés",arch:false},{id:"t5",sid:"s2",label:"Lignes 1 et 2",arch:true},
+  {id:"t6",sid:"s3",label:"Mémoriser la main droite",arch:false},
+  {id:"t7",sid:"s4",label:"Sonatine op. 36 n°3",arch:false},{id:"t8",sid:"s5",label:"Petit prélude BWV 939",arch:false},
+  {id:"t9",sid:"s6",label:"Exposition",arch:false}],
+ budgets:{"2026-11-02":5400,"2026-11-03":3600,"2026-11-05":1800,"2026-11-06":3600,"2026-11-07":3600,"2026-11-09":5400,"2026-11-10":3600,"2026-11-12":1800,"2026-11-13":3600,"2026-11-14":3600},
+ pplans:{"p1|0":14400,"p2|0":5400,"p1|1":14400,"p2|1":5400},
+ tplans:{"t1|2026-11-02":3600,"t4|2026-11-02":2700,"t7|2026-11-04":null,"t1|2026-11-09":3600,"t4|2026-11-09":2700,"t7|2026-11-09":null,"t2|2026-11-10":1800,"t8|2026-11-13":null},
+ sessions:[
+  {id:"x1",day:"2026-11-02",at:"18:30",items:[{tid:"t1",sec:4800,corr:null},{tid:"t4",sec:5400,corr:1500}]},
+  {id:"x2",day:"2026-11-05",at:"12:10",items:[{tid:"t8",sec:1800,corr:null}]},
+  {id:"x3",day:"2026-11-06",at:"19:05",items:[{tid:"t2",sec:3000,corr:null},{tid:"t4",sec:1200,corr:null}]},
+  {id:"x4",day:"2026-11-07",at:"10:20",items:[{tid:"t9",sec:1800,corr:null}]}],
+ manual:[{id:"m1",tid:"t7",day:"2026-11-04",sec:2400}],
+ live:{at:"18:42",run:0,items:[{tid:"t1",acc:840,start:Date.now()-140000},{tid:"t4",acc:372,start:null},{tid:"t7",acc:0,start:null}]}
+};
+const P=id=>D.projects.find(x=>x.id===id),S=id=>D.sections.find(x=>x.id===id),T=id=>D.tasks.find(x=>x.id===id);
+const projOf=t=>P(S(t.sid).pid);
+const path=t=>projOf(t).name+" › "+S(t.sid).name;
+const ldur=it=>it.acc+(it.start?(Date.now()-it.start)/1000:0);
+function entries(){
+  const e=[];D.sessions.forEach(s=>s.items.forEach(i=>e.push({tid:i.tid,day:s.day,sec:i.corr??i.sec})));
+  D.manual.forEach(m=>e.push({tid:m.tid,day:m.day,sec:m.sec}));
+  if(D.live)D.live.items.forEach(i=>e.push({tid:i.tid,day:TODAY,sec:ldur(i)}));
+  return e;
+}
+const real=f=>sum(entries().filter(f).map(e=>e.sec));
+const activeGrouped=()=>D.projects.filter(p=>!p.deleted).map(p=>({p,secs:D.sections.filter(s=>s.pid===p.id).map(s=>({s,tasks:D.tasks.filter(t=>t.sid===s.id&&!t.arch)}))}));
+
+/* ===== navigation ===== */
+let stack=[{v:"session"}],sheet=null,openP=new Set(["p1"]),manualSel=null;
+const cur=()=>stack[stack.length-1];
+function go(tab){stack=[{v:tab}];sheet=null;render()}
+function push(v){stack.push(v);render();document.getElementById("view").scrollTop=0}
+function back(){stack.pop();render()}
+const ICON={
+ session:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>',
+ semaine:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+ projets:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>',
+ bilan:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg>',
+ plus:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18" cy="12" r="1.8"/></svg>'};
+const PLAY='<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+const PAUSE='<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
+const BACK='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg>';
+const NEXT='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>';
+const PREV='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg>';
+const TABS=[["session","Session"],["semaine","Semaine"],["projets","Projets"],["bilan","Bilan"],["plus","Plus"]];
+
+/* ===== écrans ===== */
+const V={};
+const pcol=p=>`var(--c${D.projects.indexOf(p)%3})`;
+const byProject=list=>{const m=new Map();list.forEach(x=>{const p=projOf(x.t);if(!m.has(p.id))m.set(p.id,{p,items:[]});m.get(p.id).items.push(x)});return[...m.values()]};
+const pgHead=p=>`<div class="pg"><i style="background:${pcol(p)}"></i>${esc(p.name)}${p.deleted?' <span class="muted">(supprimé)</span>':""}</div>`;
+const planRows=day=>{const keys=Object.keys(D.tplans).filter(k=>k.endsWith("|"+day));
+  return byProject(keys.map(k=>({k,t:T(k.split("|")[0])}))).map(g=>pgHead(g.p)+g.items.map(x=>`<div class="plan"><div>${esc(x.t.label)}${x.t.arch?' <span class="muted">(archivée)</span>':""}<div class="crumb">${esc(S(x.t.sid).name)}</div></div><input class="dur-in" inputmode="numeric" placeholder="—" value="${D.tplans[x.k]==null?"":fm(D.tplans[x.k])}" data-tplan="${x.k}" aria-label="Temps prévu"><button class="x" data-act="unplan" data-k="${x.k}" aria-label="Retirer">✕</button></div>`).join("")).join("")};
+const gapH=(r,ref,w)=>{const g=gap(r,ref,w);return g&&r-ref>=60?`<span class="over">▲ ${g}</span>`:g};
+const bar=(r,b)=>{if(r==null&&b==null)return'<div class="prog"></div>';const max=Math.max(r||0,b||0)||1;const over=b!=null&&r>b;return`<div class="prog ${over?"over":""}"><i style="width:${Math.min(100,(r||0)/(b||max)*100)}%"></i></div>`};
+V.session=()=>{
+  if(!D.live){
+    const keys=Object.keys(D.tplans).filter(k=>k.endsWith("|"+TODAY));
+    return{t:"Session",s:dLong(TODAY),h:`
+      <button class="start" data-act="startSession">Démarrer une session<small>Chronomètre tes tâches une par une</small></button>
+      <div class="lbl">Prévu aujourd'hui</div>
+      ${keys.length?byProject(keys.map(k=>({k,t:T(k.split("|")[0])}))).map(g=>pgHead(g.p)+g.items.map(x=>`<div class="plan"><div>${esc(x.t.label)}<div class="crumb">${esc(S(x.t.sid).name)}</div></div><span class="v">${fm(D.tplans[x.k])}</span></div>`).join("")).join(""):'<p class="fact">Aucune tâche prévue aujourd\'hui.</p>'}
+      <div class="chips" style="margin-top:16px"><button class="chip" data-act="push" data-v="manuel">Ajout manuel</button><button class="chip" data-act="push" data-v="historique">Historique</button></div>`};
+  }
+  const L=D.live;
+  return{t:"Session",s:dLong(TODAY),h:`
+    <div class="total"><div><small>Session démarrée à ${L.at}</small><br><strong id="sessTotal">${fs(sum(L.items.map(ldur))||0)}</strong></div><small>${L.items.length} tâche${L.items.length>1?"s":""}</small></div>
+    ${L.items.length?byProject(L.items.map((it,i)=>({it,i,t:T(it.tid)}))).map(g=>pgHead(g.p)+g.items.map(({it,i,t})=>`<div class="task ${i===L.run?"on":""}"><div class="t"><div class="crumb">${esc(S(t.sid).name)}</div><div class="name">${esc(t.label)}</div></div><span class="dur" data-live="${i}">${fs(ldur(it))}</span><button class="play" data-act="toggle" data-i="${i}" aria-label="${i===L.run?"Pause":"Lancer"}">${i===L.run?PAUSE:PLAY}</button></div>`).join("")).join(""):'<p class="empty">Ajoute les tâches que tu vas travailler.</p>'}
+    <button class="secondary" style="margin-top:14px" data-act="sheet" data-s="addTasks">+ Ajouter des tâches</button>
+    <button class="primary" style="margin-top:12px" data-act="sheet" data-s="endSession">Terminer la session</button>`};
+};
+V.semaine=p=>{
+  const wi=p.wi??CUR,ds=days(wi);
+  const rows=ds.map(d=>{const k=Object.keys(D.tplans).filter(x=>x.endsWith("|"+d));return{d,b:D.budgets[d]??null,r:real(e=>e.day===d),n:k.length,pv:sum(k.map(x=>D.tplans[x]))}});
+  const wb=sum(rows.map(r=>r.b)),wr=sum(rows.map(r=>r.r));
+  const projs=D.projects.filter(x=>!x.deleted),tp=sum(projs.map(x=>D.pplans[x.id+"|"+wi]??null));
+  const g=gap(wr,wb,"budget");
+  return{t:"Semaine",s:"",h:`
+    <div class="nav"><button class="arrow" data-act="week" data-d="-1" ${wi===0?"disabled":""} aria-label="Semaine précédente">${PREV}</button><strong>${wLab(wi)}</strong><button class="arrow" data-act="week" data-d="1" ${wi===W.length-1?"disabled":""} aria-label="Semaine suivante">${NEXT}</button></div>
+    <div class="panel">
+      <div class="row" style="padding-top:0"><h3>Avancement</h3><span class="v">${fm(wr)} / ${fm(wb)}</span></div>
+      ${bar(wr,wb)}
+      <p class="fact" style="margin-top:6px">${wb==null?"Saisis ton budget jour par jour ci-dessous.":g?"Réel "+gap(wr,wb,"budget"):""}</p>
+    </div>
+    <div class="lbl">Budget de chaque jour</div>
+    <div class="card">${rows.map(r=>`<div class="drow ${r.d===TODAY?"today":""}">
+      <button data-act="push" data-v="jour" data-day="${r.d}" aria-label="Détail du ${dLong(r.d)}">
+        <span class="dn"><span>${dShort(r.d)}</span><small>Réel ${fm(r.r)}${r.n?" · "+r.n+" tâche"+(r.n>1?"s":""):""}</small></span>${bar(r.r,r.b)}</button>
+      <input class="dur-in" inputmode="numeric" placeholder="—" value="${r.b==null?"":fm(r.b)}" data-budget="${r.d}" aria-label="Budget du ${dLong(r.d)}"></div>`).join("")}
+      <div class="row" style="border-top:1px solid var(--line);padding-top:10px"><strong>Budget de la semaine</strong><span class="v">${fm(wb)}</span></div></div>
+    <div class="lbl">Temps prévu par projet</div>
+    <div class="card">
+      ${projs.map(x=>{const pv=D.pplans[x.id+"|"+wi]??null,r=real(e=>S(T(e.tid).sid).pid===x.id&&ds.includes(e.day));return`<div class="drow"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px"><span class="dn"><span>${esc(x.name)}</span><small>Réel ${fm(r)}</small></span>${bar(r,pv)}</div><input class="dur-in" inputmode="numeric" placeholder="—" value="${pv==null?"":fm(pv)}" data-pplan="${x.id}|${wi}" aria-label="Temps prévu ${esc(x.name)}"></div>`}).join("")}
+      <div class="drow" style="border-top:1px solid var(--line)"><div style="flex:1;min-width:0"><span class="dn"><span>Total prévu</span><small>Budget de la semaine ${fm(wb)}</small></span></div><span class="dur-in tot ${tp!=null&&wb!=null&&tp-wb>=60?"bad":""}">${fm(tp)}</span></div>
+      ${tp!=null&&wb!=null&&tp-wb>=60?`<p class="fact"><span class="over">▲ ${gap(tp,wb,"budget")} de la semaine</span></p>`:gap(tp,wb,"budget")?`<p class="fact">${gap(tp,wb,"budget")} de la semaine</p>`:""}
+    </div>
+    <button class="link" data-act="push" data-v="revue">Revue de semaine</button>`};
+};
+V.jour=p=>{
+  const day=p.day,wi=W.findIndex((w,i)=>days(i).includes(day)),ds=days(wi);
+  const b=D.budgets[day]??null,r=real(e=>e.day===day),keys=Object.keys(D.tplans).filter(k=>k.endsWith("|"+day)),pv=sum(keys.map(k=>D.tplans[k]));
+  const facts=[pv!=null?"Prévu "+fm(pv):null,gapH(pv,b,"budget")||null].filter(Boolean).join(" · ");
+  return{t:DL[dt(day).getDay()]+" "+dt(day).getDate()+" "+MN[dt(day).getMonth()],s:wLab(wi),h:`
+    <div class="keys">${ds.map(d=>`<button class="k ${d===TODAY?"today":""}" aria-pressed="${d===day}" data-act="day" data-day="${d}">${DN[dt(d).getDay()].replace(".","")}<b>${dt(d).getDate()}</b><i>${fm(D.budgets[d]??null)}</i></button>`).join("")}</div>
+    <div class="card">
+      <div class="row"><span>Budget</span><input class="dur-in" inputmode="numeric" placeholder="—" value="${b==null?"":fm(b)}" data-budget="${day}" aria-label="Budget du jour"></div>
+      <div class="row"><span>Réel</span><span class="v">${fm(r)}</span></div>${bar(r,b)}
+    </div>
+    <div class="lbl">Tâches prévues</div>
+    ${keys.length?planRows(day):'<p class="fact">Aucune tâche prévue ce jour.</p>'}
+    <button class="link" data-act="sheet" data-s="planTasks" data-day="${day}">+ Prévoir des tâches</button>
+    ${facts?`<div class="fact">${facts}</div>`:""}`};
+};
+V.revue=()=>({t:"Revue de semaine",s:"Archive, ajoute, mets à jour l'avancement",h:`
+  ${activeGrouped().map(g=>`<div class="group">${esc(g.p.name)}</div>${g.secs.map(x=>`
+    <div class="sect">${esc(x.s.name)}</div>
+    <textarea class="txt" rows="1" placeholder="Avancement : où en est cette section ?" data-prog="${x.s.id}" style="margin:6px 0 2px">${esc(x.s.progress??"")}</textarea>
+    ${x.tasks.map(t=>`<label class="check"><input type="checkbox" data-arch="${t.id}"><div>${esc(t.label)}</div><span class="crumb">${fm(real(e=>e.tid===t.id&&days(CUR).includes(e.day)))}</span></label>`).join("")}
+    <input class="txt" placeholder="+ Ajouter une tâche" data-newtask="${x.s.id}" style="margin:6px 0 4px">`).join("")}`).join("")}
+  <p class="fact">À droite : temps réel de la semaine.</p>
+  <button class="primary" id="archBtn" data-act="archSel" disabled style="margin-top:12px">Archiver la sélection (0)</button>`});
+V.projets=()=>({t:"Projets",s:"",h:`
+  ${D.projects.filter(p=>!p.deleted).map(p=>{const n=D.tasks.filter(t=>!t.arch&&S(t.sid).pid===p.id).length;
+    return`<button class="pcard" data-act="push" data-v="projet" data-id="${p.id}"><strong>${esc(p.name)}</strong><span class="crumb">${[p.start?"depuis le "+dLong(p.start).slice(5):null,p.end?"jusqu'au "+dLong(p.end).slice(5):null,n+" tâche"+(n>1?"s":"")+" active"+(n>1?"s":"")].filter(Boolean).join(" · ")}</span></button>`}).join("")}
+  <button class="secondary" data-act="sheet" data-s="newProject">+ Nouveau projet</button>`});
+V.projet=p=>{
+  const pr=P(p.id);if(!pr||pr.deleted)return V.projets();
+  return{t:pr.name,s:[pr.start?"Depuis le "+dLong(pr.start).slice(5):"Sans date de début",pr.end?"jusqu'au "+dLong(pr.end).slice(5):null].filter(Boolean).join(" · "),h:`
+  <div class="chips"><button class="chip" data-act="push" data-v="planning" data-id="${pr.id}">Planning</button><button class="chip" data-act="push" data-v="bilanProjet" data-id="${pr.id}">Bilan du projet</button><button class="chip danger" data-act="sheet" data-s="delProject" data-id="${pr.id}">Supprimer</button></div>
+  ${D.sections.filter(s=>s.pid===pr.id).map(s=>{const act=D.tasks.filter(t=>t.sid===s.id&&!t.arch),arc=D.tasks.filter(t=>t.sid===s.id&&t.arch);return`
+  <div class="card"><strong>${esc(s.name)}</strong>
+    <textarea class="txt" rows="1" placeholder="Avancement : où en est cette section ?" data-prog="${s.id}" style="margin:8px 0">${esc(s.progress??"")}</textarea>
+    ${act.map(t=>`<div class="trow"><span>${esc(t.label)}</span><button class="mini" data-act="archive" data-id="${t.id}">Archiver</button></div>`).join("")}
+    <input class="txt" placeholder="+ Ajouter une tâche" data-newtask="${s.id}" style="margin-top:8px">
+    ${arc.length?`<details class="arch"><summary>Tâches archivées (${arc.length})</summary>${arc.map(t=>`<div class="trow"><span class="archived">${esc(t.label)}</span><button class="mini go" data-act="reactivate" data-id="${t.id}">Réactiver</button></div>`).join("")}</details>`:""}
+  </div>`}).join("")}
+  <input class="txt" placeholder="+ Nouvelle section" data-newsection="${pr.id}">`};
+};
+V.planning=p=>{
+  const pr=P(p.id),secs=D.sections.filter(s=>s.pid===pr.id);
+  const cell=(s,wi,kind)=>{const on=(kind==="ini"?s.ini:s.rev).includes(wi);
+    if(kind==="ini")return`<span class="cell fixed ${on?"ini":""}" aria-label="${on?"prévu":"vide"}"></span>`;
+    return`<button class="cell ${on?"rev":""}" data-act="cell" data-sid="${s.id}" data-wi="${wi}" aria-label="${esc(s.name)}, ${wLab(wi)}, ${on?"placée":"vide"}"></button>`};
+  return{t:"Planning",s:pr.name,h:`
+  <div class="legend"><span><i style="background:var(--line)"></i>Prévu initial</span><span><i style="background:var(--felt)"></i>Prévu revu</span></div>
+  <div class="grid-wrap"><table class="grid"><thead><tr><th></th><th></th>${W.map((w,i)=>`<th class="${i===CUR?"cur":""}">${wShort(i)}</th>`).join("")}</tr></thead><tbody>
+  ${secs.map(s=>s.ini.length?`<tr><td class="name" rowspan="2">${esc(s.name)}</td><td class="kind">initial</td>${W.map((_,i)=>`<td>${cell(s,i,"ini")}</td>`).join("")}</tr><tr><td class="kind">revu</td>${W.map((_,i)=>`<td>${cell(s,i,"rev")}</td>`).join("")}</tr>`
+   :`<tr><td class="name">${esc(s.name)}</td><td class="kind">à placer</td>${W.map((_,i)=>`<td>${cell(s,i,"rev")}</td>`).join("")}</tr>`).join("")}
+  </tbody></table></div>
+  <p class="fact">Touche une case pour placer ou retirer une semaine. Le premier placement d'une section est gardé comme prévu initial.</p>
+  <div class="lbl">Avancement</div>
+  ${secs.map(s=>`<div class="sect">${esc(s.name)}${JSON.stringify(s.ini)!==JSON.stringify(s.rev)&&s.ini.length?'<span class="tag">modifié</span>':""}</div><textarea class="txt" rows="1" placeholder="Où en est cette section ?" data-prog="${s.id}" style="margin:6px 0">${esc(s.progress??"")}</textarea>`).join("")}`};
+};
+function weekReport(wi){
+  const ds=days(wi),inW=e=>ds.includes(e.day);
+  const rows=ds.map(d=>({d,b:D.budgets[d]??null,r:real(e=>e.day===d)}));
+  const wb=sum(rows.map(r=>r.b)),wr=sum(rows.map(r=>r.r));
+  const projects=D.projects.map(p=>{
+    const secs=D.sections.filter(s=>s.pid===p.id).map(s=>{
+      const tasks=D.tasks.filter(t=>t.sid===s.id).map(t=>({t,r:real(e=>e.tid===t.id&&inW(e)),pv:sum(ds.map(d=>D.tplans[t.id+"|"+d]??null))})).filter(x=>x.r!=null||x.pv!=null);
+      return{s,r:sum(tasks.map(x=>x.r)),tasks}}).filter(x=>x.tasks.length);
+    return{p,pv:D.pplans[p.id+"|"+wi]??null,r:sum(secs.map(x=>x.r)),secs}}).filter(x=>x.secs.length||x.pv!=null);
+  const planning=D.sections.filter(s=>s.rev.includes(wi)&&!P(s.pid).deleted).map(s=>({s,ini:s.ini.includes(wi)}));
+  return{rows,wb,wr,projects,planning};
+}
+function colChart(id,cols,sel,word){
+  const Wd=340,H=150,L=26,B=128,top=12;
+  if(sel==null){sel=cols.findIndex(c=>c.hl);if(sel<0){sel=cols.length-1;while(sel>0&&cols[sel].r==null&&cols[sel].b==null)sel--}}
+  const mx=Math.max(3600,...cols.map(c=>Math.max(c.r||0,c.b||0)));const hrs=Math.ceil(mx/3600),step=hrs>6?2:1,max=Math.ceil(hrs/step)*step*3600;
+  const y=v=>B-(v/max)*(B-top),cw=(Wd-L)/cols.length,bw=Math.min(28,cw*.6);
+  const top4=(x,yt,w,h,cls)=>h>4?`<path class="${cls}" d="M${x},${yt+h}V${yt+4}q0,-4 4,-4h${w-8}q4,0 4,4V${yt+h}z"/>`:`<rect class="${cls}" x="${x}" y="${yt}" width="${w}" height="${h}"/>`;
+  let g="";for(let h=0;h<=max/3600;h+=step){g+=`<line class="grid-l" x1="${L}" x2="${Wd}" y1="${y(h*3600)}" y2="${y(h*3600)}"/><text x="${L-6}" y="${y(h*3600)+3}" text-anchor="end">${h}h</text>`}
+  cols.forEach((c,i)=>{const x=L+cw*i+cw/2-bw/2,r=c.r||0,b=c.b;
+    let m="";
+    if(b!=null&&b>0)m+=top4(x,y(b),bw,B-y(b),"gb");
+    if(r>0){const inB=b!=null?Math.min(r,b):r;
+      if(b!=null&&r>b){m+=`<rect class="bar" x="${x}" y="${y(inB)}" width="${bw}" height="${B-y(inB)}"/>`+top4(x,y(r),bw,Math.max(0,y(inB)-y(r)-2),"exc")}
+      else m+=top4(x,y(inB),bw,B-y(inB),"bar")}
+    g+=`<g class="${i===sel?"on":"off"}">${m}</g>`;
+    if(i===sel&&(c.r!=null))g+=`<text x="${x+bw/2}" y="${y(Math.max(r,b||0))-5}" text-anchor="middle" class="hl">${fm(c.r)}</text>`;
+    g+=`<text x="${x+bw/2}" y="${H-6}" text-anchor="middle" class="${i===sel?"hl":""}">${c.lab}</text>`;
+    g+=`<rect class="hit" x="${L+cw*i}" y="0" width="${cw}" height="${H}" tabindex="0" role="button" aria-label="${esc(c.full)}" data-act="tip" data-chart="${id}" data-i="${i}"/>`});
+  const c=cols[sel],gp=gap(c.r,c.b,word);
+  return`<div class="chart"><div class="tipbox"><b>${c.full}</b><span>Réel <strong>${fm(c.r)}</strong> · ${word==="budget"?"Budget":"Prévu"} <strong>${fm(c.b)}</strong></span>${gp?`<em>${gp}</em>`:`<em>${c.b==null?(word==="budget"?"Budget non saisi":"Pas de temps prévu"):""}</em>`}</div>
+    <svg viewBox="0 0 ${Wd} ${H}" role="img" aria-label="Réel et ${word} par colonne">${g}</svg>
+    <div class="legend2"><span><i></i>Réel</span><span><i class="g"></i>${word==="budget"?"Budget":"Prévu"}</span><span><i class="e"></i>Au-dessus du ${word}</span></div></div>`;
+}
+function hbars(rows){
+  const max=Math.max(1,...rows.map(r=>Math.max(r.r||0,r.pv||0)));
+  return rows.map(r=>`<details class="hb" data-pid="${r.id}" ${openP.has(r.id)?"open":""}><summary><div class="top"><b>${r.name}</b><span>Réel ${fm(r.r)}${r.pv!=null?" / Prévu "+fm(r.pv):""}</span></div>
+    <div class="track">${r.pv!=null?`<span class="pv" style="width:${r.pv/max*100}%"></span>`:""}<span class="rl" style="width:${(r.r||0)/max*100}%;background:${r.color}"></span></div></summary>${r.detail||""}</details>`).join("");
+}
+V.bilan=p=>{
+  const wi=p.wi??CUR,R=weekReport(wi),live=D.live&&wi===CUR,ds=days(wi);
+  const empty=R.wr==null&&R.wb==null&&!R.projects.length;
+  const g=gap(R.wr,R.wb,"budget"),tp=sum(R.projects.map(x=>x.pv));
+  const sub=x=>`<div class="sub">${x.secs.map(s=>`<div class="line"><span>${esc(s.s.name)}</span><span>${fm(s.r)}</span></div>${s.tasks.map(t=>`<div class="line"><span>· ${esc(t.t.label)}${t.t.arch?' <span class="muted">(archivée)</span>':""}</span><span>${t.pv!=null?"Prévu "+fm(t.pv)+" · ":""}${fm(t.r)}</span></div>`).join("")}`).join("")}${x.p.deleted?"":`<button class="link" data-act="push" data-v="bilanProjet" data-id="${x.p.id}">Bilan du projet</button>`}</div>`;
+  return{t:"Bilan",s:"",h:`
+  <div class="nav"><button class="arrow" data-act="bweek" data-d="-1" ${wi===0?"disabled":""} aria-label="Semaine précédente">${PREV}</button><strong>${wLab(wi)}</strong><button class="arrow" data-act="bweek" data-d="1" ${wi===W.length-1?"disabled":""} aria-label="Semaine suivante">${NEXT}</button></div>
+  ${empty?'<p class="empty">Rien de prévu ni de travaillé cette semaine pour l\'instant.</p>':`
+  <div class="tiles">
+    <div class="tile"><span>${live?'<i class="live"></i>':""}Réel</span><b>${fm(R.wr)}</b></div>
+    <div class="tile"><span>Budget</span><b>${fm(R.wb)}</b></div>
+    <div class="tile"><span>Prévu projets</span><b>${fm(tp)}</b></div>
+  </div>
+  ${bar(R.wr,R.wb)}
+  <p class="fact" style="margin:6px 0 14px">${g?"Réel "+gap(R.wr,R.wb,"budget")+".":"Budget non saisi."}${live?" La session en cours est comptée en direct.":""}</p>
+  <div class="panel"><h3>Par jour</h3>
+    ${colChart("cj",R.rows.map(r=>({lab:DN[dt(r.d).getDay()].replace(".","")+" "+dt(r.d).getDate(),r:r.r,b:r.b,hl:r.d===TODAY,full:dLong(r.d)})),p.sel_cj,"budget")}<p class="fact" style="margin-top:6px">Touche un jour pour voir son détail.</p></div>
+  <div class="panel"><h3>Par projet</h3>
+    ${R.wr?`<p class="fact">Répartition de ton temps réel cette semaine</p><div class="split">${R.projects.filter(x=>x.r).map(x=>`<span style="width:${x.r/R.wr*100}%;background:${pcol(x.p)}" title="${esc(x.p.name)}"></span>`).join("")}</div>
+    <div class="splitleg">${R.projects.filter(x=>x.r).map(x=>`<span><i style="background:${pcol(x.p)}"></i>${esc(x.p.name)} <b>${Math.round(x.r/R.wr*100)} %</b></span>`).join("")}</div>`:""}
+    ${R.projects.map(x=>{const pct=x.pv&&x.r!=null?Math.round(x.r/x.pv*100):null;return`<div class="prj">
+      <div class="prj-h"><span class="pn"><i style="background:${pcol(x.p)}"></i><b>${esc(x.p.name)}</b>${x.p.deleted?' <span class="muted">(supprimé)</span>':""}</span><span class="pv"><strong>${fm(x.r)}</strong><small> / ${x.pv!=null?fm(x.pv)+" prévu":"pas de prévu"}</small></span></div>
+      ${x.pv!=null?bar(x.r,x.pv):""}
+      <div class="fact">${x.pv!=null?(pct??0)+" % du temps prévu"+(x.r>x.pv?` · ${gap(x.r,x.pv,"prévu")}`:""):"Aucun temps prévu pour ce projet cette semaine"}</div>
+      <details class="tk" data-pid="sec-${x.p.id}" ${openP.has("sec-"+x.p.id)?"open":""}><summary>Voir les sections (${x.secs.length})</summary><div class="secs">${x.secs.map(s=>`<div class="srow"><span>${esc(s.s.name)}</span><span class="sb"><i style="width:${x.r?(s.r||0)/x.r*100:0}%;background:${pcol(x.p)}"></i></span><span class="v">${fm(s.r)}</span></div>`).join("")}</div></details>
+      <details class="tk" data-pid="tk-${x.p.id}" ${openP.has("tk-"+x.p.id)?"open":""}><summary>Voir les tâches (${x.secs.reduce((n,s)=>n+s.tasks.length,0)})</summary>${x.secs.map(s=>s.tasks.map(t=>`<div class="line"><span>${esc(t.t.label)}${t.t.arch?' <span class="muted">(archivée)</span>':""}<br><span class="crumb">${esc(s.s.name)}</span></span><span>${t.pv!=null?"prévu "+fm(t.pv)+" · ":""}${fm(t.r)}</span></div>`).join("")).join("")}</details>
+      ${x.p.deleted?"":`<button class="link" data-act="push" data-v="bilanProjet" data-id="${x.p.id}">Bilan du projet</button>`}
+    </div>`}).join("")}</div>
+  <div class="panel"><h3>Planning de la semaine</h3>
+    ${R.planning.length?byProject(R.planning.map(x=>({t:D.tasks.find(t=>t.sid===x.s.id)||{sid:x.s.id},x}))).map(g=>`<div class="pl-p"><i style="background:${pcol(g.p)}"></i>${esc(g.p.name)}</div><div class="chipset">${g.items.map(({x})=>`<span class="pchip">${esc(x.s.name)}<span class="muted">${x.ini?"initial":"ajouté au revu"}</span></span>`).join("")}</div>`).join(""):'<p class="fact">Aucune section placée cette semaine.</p>'}</div>`}`};
+};
+const range=a=>{if(!a.length)return"non placé";const s=[...a].sort((x,y)=>x-y);const cont=s.every((v,i)=>!i||v===s[i-1]+1);
+  if(cont){const e=dt(W[s[s.length-1]]);e.setDate(e.getDate()+6);return s.length===1?wLab(s[0]).replace("Semaine du ","sem. du "):wShort(s[0])+" → "+e.getDate()+" "+MN[e.getMonth()]}return s.map(wShort).join(", ")};
+V.bilanProjet=p=>{
+  const pr=P(p.id),secs=D.sections.filter(s=>s.pid===pr.id),inP=e=>S(T(e.tid).sid).pid===pr.id;
+  const tot=real(inP);
+  const wks=W.map((w,i)=>({i,pv:D.pplans[pr.id+"|"+i]??null,r:real(e=>inP(e)&&days(i).includes(e.day))}));
+  const shown=wks.filter((x,i)=>i<=CUR+1);
+  const act=D.tasks.filter(t=>!t.arch&&S(t.sid).pid===pr.id).length;
+  return{t:"Bilan du projet",s:pr.name,h:`
+  <div class="tiles">
+    <div class="tile"><span>Réel total</span><b>${fm(tot)}</b></div>
+    <div class="tile"><span>Semaines</span><b>${wks.filter(x=>x.r!=null).length}</b><small>travaillées</small></div>
+    <div class="tile"><span>Tâches</span><b>${act}</b><small>actives</small></div>
+  </div>
+  <div class="panel"><h3>Par semaine</h3>
+    ${colChart("cw",shown.map(x=>({lab:wShort(x.i),r:x.r,b:x.pv,hl:x.i===CUR,full:wLab(x.i)})),p.sel_cw,"prévu")}<p class="fact" style="margin-top:6px">Touche une semaine pour voir son détail.</p></div>
+  <div class="panel"><h3>Par section</h3><p class="fact">Touche une section pour ses tâches, son planning et son avancement.</p>
+    ${hbars(secs.map(s=>({id:s.id,name:esc(s.name),r:real(e=>T(e.tid).sid===s.id),pv:null,color:pcol(pr),
+      detail:`<div class="sub"><div class="line"><span>Planning</span><span>initial ${range(s.ini)} · revu ${range(s.rev)}</span></div><div class="line"><span>Avancement</span><span>${s.progress?esc(s.progress):"—"}</span></div>${D.tasks.filter(t=>t.sid===s.id).map(t=>`<div class="line"><span>· ${esc(t.label)}${t.arch?' <span class="muted">(archivée)</span>':""}</span><span>${fm(real(e=>e.tid===t.id))}</span></div>`).join("")}</div>`})))}
+  </div>`};
+};
+V.plus=()=>({t:"Plus",s:"",h:`<div class="menu">
+  <button data-act="push" data-v="sauvegarde"><span>Sauvegarde</span><span class="muted">il y a 3 jours</span></button>
+  <button data-act="push" data-v="historique"><span>Historique des sessions</span></button>
+  <button data-act="push" data-v="manuel"><span>Ajout manuel</span></button>
+  <button disabled><span>Notes de cours</span><span>bientôt</span></button>
+  <button disabled><span>À propos</span><span>v0.1 · prototype</span></button></div>`});
+V.sauvegarde=()=>({t:"Sauvegarde",s:"",h:`
+  <p class="fact" style="font-size:14px;margin-bottom:16px">Tes données sont uniquement sur ce téléphone. Fais une sauvegarde régulièrement et garde le fichier ailleurs (mail, Drive).</p>
+  <div class="row"><span>Dernière sauvegarde</span><span class="v">il y a 3 jours</span></div>
+  <button class="primary" style="margin-top:14px" data-act="toast" data-m="Sauvegarde exportée">Exporter une sauvegarde</button>
+  <button class="secondary" style="margin-top:10px" data-act="sheet" data-s="restore">Restaurer une sauvegarde</button>`});
+V.historique=()=>{
+  const items=[...D.sessions.map(s=>({k:"s",day:s.day,s})),...D.manual.map(m=>({k:"m",day:m.day,m}))].sort((a,b)=>a.day<b.day?1:-1);
+  return{t:"Historique",s:"Sessions et ajouts manuels",h:`
+  ${D.live?`<div class="card"><strong>${dShort(TODAY)} · ${D.live.at}</strong> <span class="tag">en cours</span></div>`:""}
+  ${items.map(x=>x.k==="m"?`<div class="card"><div class="row"><strong>${dShort(x.day)}</strong><span class="crumb">Ajout manuel</span></div><div class="row"><span>${esc(T(x.m.tid).label)}</span><span class="v">${fm(x.m.sec)}</span></div></div>`
+   :`<details class="card"><summary class="row" style="cursor:pointer"><strong>${dShort(x.day)} · ${x.s.at}</strong><span class="v">${fm(sum(x.s.items.map(i=>i.corr??i.sec)))}</span></summary>
+     ${x.s.items.map((i,n)=>`<div class="plan"><div>${esc(T(i.tid).label)}${i.corr!=null?' <span class="muted">(corrigée)</span>':""}<div class="crumb">${esc(path(T(i.tid)))}</div></div><input class="dur-in" inputmode="numeric" value="${fm(i.corr??i.sec)}" data-corr="${x.s.id}|${n}" aria-label="Corriger la durée">${i.corr!=null?`<button class="x" data-act="uncorr" data-k="${x.s.id}|${n}" aria-label="Annuler la correction">↺</button>`:""}</div>`).join("")}
+     <p class="fact">Modifie une durée pour la corriger (oubli d'arrêt du chrono).</p></details>`).join("")}`};
+};
+V.manuel=()=>{
+  const opts=activeGrouped().map(g=>`<optgroup label="${esc(g.p.name)}">${g.secs.map(x=>x.tasks.map(t=>`<option value="${t.id}" ${manualSel===t.id?"selected":""}>${esc(x.s.name)} › ${esc(t.label)}</option>`).join("")).join("")}</optgroup>`).join("");
+  const dayOpts=[...days(0),...days(1)].filter(d=>d<=TODAY).reverse().map(d=>`<option value="${d}">${dLong(d)}</option>`).join("");
+  return{t:"Ajout manuel",s:"Une durée oubliée, sans heures",h:`
+  <label class="lbl" for="mTask" style="display:block">Tâche</label><select class="txt" id="mTask"><option value="">Choisir une tâche</option>${opts}</select>
+  <label class="lbl" for="mDay" style="display:block">Jour</label><select class="txt" id="mDay">${dayOpts}</select>
+  <label class="lbl" for="mDur" style="display:block">Durée</label><input class="txt" id="mDur" inputmode="numeric" placeholder="ex. 45 ou 1:30">
+  <button class="primary" style="margin-top:16px" data-act="addManual">Ajouter</button>
+  <div class="lbl">Derniers ajouts manuels</div>
+  ${D.manual.length?D.manual.map(m=>`<div class="plan"><div>${esc(T(m.tid).label)}<div class="crumb">${dLong(m.day)}</div></div><span class="v">${fm(m.sec)}</span><button class="x" data-act="delManual" data-id="${m.id}" aria-label="Supprimer">✕</button></div>`).join(""):'<p class="fact">Aucun ajout manuel.</p>'}`};
+};
+
+/* ===== feuilles ===== */
+const SH={};
+const taskChecks=(checked,first)=>{
+  let h="";if(first&&first.length)h+=`<div class="group">Prévu aujourd'hui</div>`+first.map(t=>`<label class="check"><input type="checkbox" value="${t.id}" ${checked(t)?"checked":""}><div>${esc(t.label)}<div class="crumb">${esc(path(t))}</div></div></label>`).join("");
+  return h+activeGrouped().map(g=>`<div class="group">${esc(g.p.name)}</div>${g.secs.map(x=>x.tasks.length?`<div class="sect">${esc(x.s.name)}</div>${x.tasks.filter(t=>!first||!first.includes(t)).map(t=>`<label class="check"><input type="checkbox" value="${t.id}" ${checked(t)?"checked":""}><div>${esc(t.label)}</div></label>`).join("")}`:"").join("")}`).join("")};
+SH.addTasks=()=>{const inS=new Set(D.live.items.map(i=>i.tid));const today=Object.keys(D.tplans).filter(k=>k.endsWith("|"+TODAY)).map(k=>T(k.split("|")[0])).filter(t=>!t.arch);
+  const secOpts=activeGrouped().map(g=>`<optgroup label="${esc(g.p.name)}">${g.secs.map(x=>`<option value="${x.s.id}">${esc(x.s.name)}</option>`).join("")}</optgroup>`).join("");
+  return{t:"Ajouter des tâches",h:taskChecks(t=>inS.has(t.id),today)+`<div class="group">Créer une tâche</div><select class="txt" id="nSec" aria-label="Section"><option value="">Section (obligatoire)</option>${secOpts}</select><input class="txt" id="nLab" placeholder="Libellé de la tâche" style="margin-top:8px">`,ok:"Ajouter à la session",act:"confirmAdd"}};
+SH.planTasks=s=>({t:"Prévoir "+dShort(s.day),h:taskChecks(t=>(t.id+"|"+s.day) in D.tplans),ok:"Enregistrer",act:"confirmPlan"});
+SH.endSession=()=>({t:"Terminer la session ?",h:`<p class="fact" style="font-size:15px">Durée totale ${fm(sum(D.live.items.map(ldur)))}. Le chrono en cours sera arrêté.</p>`,ok:"Terminer",act:"confirmEnd"});
+SH.delProject=s=>({t:"Supprimer « "+esc(P(s.id).name)+" » ?",h:`<p class="fact" style="font-size:15px">Le projet, ses sections et ses tâches disparaîtront de tes listes. Le temps déjà passé reste compté dans tes bilans.</p>`,ok:"Supprimer",act:"confirmDel"});
+SH.newProject=()=>({t:"Nouveau projet",h:`<label class="lbl" for="npN" style="display:block">Nom</label><input class="txt" id="npN" placeholder="Un morceau, le déchiffrage…">
+  <label class="lbl" for="npS" style="display:block">Date de début (facultative)</label><input class="txt" type="date" id="npS">
+  <label class="lbl" for="npE" style="display:block">Date de fin (facultative)</label><input class="txt" type="date" id="npE"><p class="fact" id="npErr"></p>`,ok:"Enregistrer",act:"confirmProject"});
+SH.restore=()=>({t:"Restaurer une sauvegarde",h:`<p class="fact" style="font-size:15px">Fichier choisi : piano-sauvegarde-2026-11-06.json<br>3 projets, 9 tâches, 4 sessions — exporté le ven. 6 nov.</p><p class="fact" style="font-size:15px">Ceci remplace toutes les données actuelles de l'app.</p>`,ok:"Restaurer",act:"confirmRestore"});
+
+/* ===== rendu ===== */
+function render(){
+  const v=cur(),r=V[v.v](v);
+  document.getElementById("head").innerHTML=`${stack.length>1?`<button class="back" data-act="back" aria-label="Retour">${BACK}</button>`:""}<div><h1>${esc(r.t)}</h1>${r.s?`<p>${esc(r.s)}</p>`:""}</div>`;
+  document.getElementById("view").innerHTML=r.h;
+  document.getElementById("tabs").innerHTML=TABS.map(([k,l])=>`<button class="tab" data-act="tab" data-v="${k}" ${stack[0].v===k?'aria-current="page"':""}>${ICON[k]}${l}</button>`).join("");
+  const host=document.getElementById("sheetHost");
+  if(sheet){const s=SH[sheet.s](sheet);host.innerHTML=`<div class="scrim" data-act="close"><div class="sheet" role="dialog" aria-label="${esc(s.t)}"><header><h2>${s.t}</h2><button class="x" data-act="close" aria-label="Fermer">✕</button></header><div class="body">${s.h}</div><footer><button class="ghost" data-act="close">Annuler</button><button class="primary" data-act="${s.act}">${s.ok}</button></footer></div></div>`}else host.innerHTML="";
+  tick();
+}
+function tick(){
+  const d=new Date();document.getElementById("clock").textContent=d.getHours()+":"+pad(d.getMinutes());
+  const L=D.live,band=document.getElementById("band");
+  band.hidden=!L||(stack.length===1&&stack[0].v==="session");
+  if(L){
+    document.querySelectorAll("[data-live]").forEach(e=>e.textContent=fs(ldur(L.items[e.dataset.live])));
+    const st=document.getElementById("sessTotal");if(st)st.textContent=fs(sum(L.items.map(ldur))||0);
+    if(!band.hidden){const it=L.run!=null?L.items[L.run]:null;
+      band.innerHTML=it?`<span>● ${esc(T(it.tid).label)}</span><b>${fs(ldur(it))}</b><button data-act="bandToggle" aria-label="Pause">${PAUSE}</button>`:`<span>Session en cours · en pause</span><button data-act="bandToggle" aria-label="Reprendre">${PLAY}</button>`}
+  }
+}
+function toggle(i){const L=D.live;if(L.run!=null){const it=L.items[L.run];it.acc=ldur(it);it.start=null}
+  L.run=L.run===i?null:i;if(L.run!=null){L.items[L.run].start=Date.now();L.last=L.run}render()}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.hidden=false;clearTimeout(t._t);t._t=setTimeout(()=>t.hidden=true,2200)}
+const checked=()=>[...document.querySelectorAll(".sheet input[type=checkbox]:checked")].map(c=>c.value);
+
+/* ===== actions ===== */
+const A={
+ tab:e=>go(e.dataset.v), back:()=>back(), push:e=>push({v:e.dataset.v,id:e.dataset.id,day:e.dataset.day}),
+ sheet:e=>{sheet={s:e.dataset.s,day:e.dataset.day,id:e.dataset.id};render()},
+ close:(e,ev)=>{if(ev.target===e){sheet=null;render()}},
+ toggle:e=>toggle(+e.dataset.i),
+ bandToggle:()=>toggle(D.live.run!=null?D.live.run:(D.live.last??0)),
+ startSession:()=>{const d=new Date();D.live={at:d.getHours()+":"+pad(d.getMinutes()),run:null,items:[]};sheet={s:"addTasks"};render()},
+ confirmAdd:()=>{const ids=checked(),inS=new Set(D.live.items.map(i=>i.tid));
+   D.live.items=D.live.items.filter(i=>ids.includes(i.tid)||ldur(i)>0);
+   ids.forEach(id=>{if(!inS.has(id))D.live.items.push({tid:id,acc:0,start:null})});
+   const sec=document.getElementById("nSec").value,lab=document.getElementById("nLab").value.trim();
+   if(lab&&!sec){toast("Choisis une section pour la nouvelle tâche");return}
+   if(lab){const t={id:nid("t"),sid:sec,label:lab,arch:false};D.tasks.push(t);D.live.items.push({tid:t.id,acc:0,start:null})}
+   if(D.live.run!=null&&D.live.run>=D.live.items.length)D.live.run=null;sheet=null;render()},
+ confirmEnd:()=>{const L=D.live;if(L.run!=null)toggle(L.run);
+   if(L.items.length)D.sessions.push({id:nid("x"),day:TODAY,at:L.at,items:L.items.map(i=>({tid:i.tid,sec:Math.round(i.acc),corr:null}))});
+   D.live=null;sheet=null;render();toast("Session enregistrée")},
+ week:e=>{const v=cur();v.wi=(v.wi??CUR)+ +e.dataset.d;v.sel=0;render()},
+ day:e=>{stack[stack.length-1]={v:"jour",day:e.dataset.day};render()},
+ tip:e=>{cur()["sel_"+e.dataset.chart]=+e.dataset.i;const v=document.getElementById("view"),y=v.scrollTop;render();v.scrollTop=y},
+ unplan:e=>{delete D.tplans[e.dataset.k];render()},
+ confirmPlan:()=>{const ids=checked(),day=sheet.day;
+   Object.keys(D.tplans).filter(k=>k.endsWith("|"+day)&&!ids.includes(k.split("|")[0])&&!T(k.split("|")[0]).arch).forEach(k=>delete D.tplans[k]);
+   ids.forEach(id=>{const k=id+"|"+day;if(!(k in D.tplans))D.tplans[k]=null});sheet=null;render()},
+ archSel:()=>{const ids=[...document.querySelectorAll("[data-arch]:checked")].map(c=>c.dataset.arch);ids.forEach(id=>T(id).arch=true);render();toast(ids.length+" tâche"+(ids.length>1?"s archivées":" archivée"))},
+ archive:e=>{const t=T(e.dataset.id);t.arch=true;render();toast("Tâche archivée")},
+ reactivate:e=>{T(e.dataset.id).arch=false;render();toast("Tâche réactivée")},
+ confirmDel:()=>{P(sheet.id).deleted=true;sheet=null;stack=[{v:"projets"}];render();toast("Projet supprimé")},
+ confirmProject:()=>{const n=document.getElementById("npN").value.trim(),s=document.getElementById("npS").value||null,en=document.getElementById("npE").value||null,err=document.getElementById("npErr");
+   if(!n){err.textContent="Donne un nom au projet.";return}if(s&&en&&en<s){err.textContent="La date de fin doit être après la date de début.";return}
+   const p={id:nid("p"),name:n,start:s,end:en,deleted:false};D.projects.push(p);sheet=null;stack=[{v:"projets"},{v:"projet",id:p.id}];render()},
+ cell:e=>{const s=S(e.dataset.sid),wi=+e.dataset.wi;
+   if(!s.ini.length){s.ini=[wi];s.rev=[wi];toast("Premier placement gardé comme prévu initial")}
+   else s.rev=s.rev.includes(wi)?s.rev.filter(x=>x!==wi):[...s.rev,wi].sort((a,b)=>a-b);render()},
+ bweek:e=>{const v=cur();v.wi=(v.wi??CUR)+ +e.dataset.d;render()},
+ uncorr:e=>{const[sid,n]=e.dataset.k.split("|");D.sessions.find(s=>s.id===sid).items[n].corr=null;render()},
+ addManual:()=>{const t=document.getElementById("mTask").value,d=document.getElementById("mDay").value,s=parse(document.getElementById("mDur").value);
+   if(!t){toast("Choisis une tâche");return}if(!s){toast("Indique une durée, par exemple 45 ou 1:30");return}
+   D.manual.unshift({id:nid("m"),tid:t,day:d,sec:s});manualSel=null;render();toast("Ajout manuel enregistré")},
+ delManual:e=>{D.manual=D.manual.filter(m=>m.id!==e.dataset.id);render()},
+ toast:e=>toast(e.dataset.m),
+ confirmRestore:()=>{sheet=null;render();toast("Sauvegarde restaurée")}
+};
+document.getElementById("phone").addEventListener("click",ev=>{const e=ev.target.closest("[data-act]");if(!e||!A[e.dataset.act])return;
+  if(e.dataset.act!=="close")ev.stopPropagation();A[e.dataset.act](e,ev)});
+document.getElementById("band").addEventListener("click",ev=>{if(!ev.target.closest("button"))go("session")});
+document.getElementById("phone").addEventListener("change",ev=>{const e=ev.target,ds=e.dataset;
+  const dur=()=>{const v=parse(e.value);if(v===undefined){toast("Durée non comprise : écris 45 ou 1:30");return undefined}return v};
+  if(ds.budget!=null){const v=dur();if(v===undefined)return;if(v==null)delete D.budgets[ds.budget];else D.budgets[ds.budget]=v;render()}
+  else if(ds.tplan!=null){const v=dur();if(v===undefined)return;D.tplans[ds.tplan]=v;render()}
+  else if(ds.pplan!=null){const v=dur();if(v===undefined)return;if(v==null)delete D.pplans[ds.pplan];else D.pplans[ds.pplan]=v;render()}
+  else if(ds.prog!=null){S(ds.prog).progress=e.value.trim()||null}
+  else if(ds.corr!=null){const v=dur();if(v===undefined||v==null)return;const[sid,n]=ds.corr.split("|");const it=D.sessions.find(s=>s.id===sid).items[n];if(v!==it.sec)it.corr=v;render();toast("Durée corrigée")}
+  else if(ds.arch!=null){const n=document.querySelectorAll("[data-arch]:checked").length,b=document.getElementById("archBtn");b.disabled=!n;b.textContent="Archiver la sélection ("+n+")"}
+  else if(e.id==="mTask")manualSel=e.value||null;
+});
+document.getElementById("phone").addEventListener("keydown",ev=>{const e=ev.target;if(ev.key!=="Enter"||!e.value||!e.value.trim())return;
+  if(e.dataset.newtask){D.tasks.push({id:nid("t"),sid:e.dataset.newtask,label:e.value.trim(),arch:false});render();const n=document.querySelector(`[data-newtask="${e.dataset.newtask}"]`);n&&n.focus()}
+  else if(e.dataset.newsection){const pid=e.dataset.newsection;D.sections.push({id:nid("s"),pid,name:e.value.trim(),progress:null,ini:[],rev:[]});render()}});
+document.getElementById("phone").addEventListener("toggle",ev=>{const p=ev.target.dataset&&ev.target.dataset.pid;if(p){ev.target.open?openP.add(p):openP.delete(p)}},true);
+
+let tk=0;
+render();
+setInterval(()=>{tick();const v=cur();if(++tk%5===0&&v.v==="bilan"&&D.live&&D.live.run!=null&&!sheet&&!document.activeElement.matches("input,textarea,select")){const y=document.getElementById("view").scrollTop;render();document.getElementById("view").scrollTop=y}},1000);
+</script>
