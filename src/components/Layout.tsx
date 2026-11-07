@@ -21,14 +21,14 @@ export function Layout() {
 
   return (
     <div className="flex h-dvh flex-col bg-surface text-base text-ink">
-      <header className="shrink-0 px-4 pt-[calc(env(safe-area-inset-top)+1rem)] pb-3">
-        <h1 className="text-2xl font-semibold">{handle?.title}</h1>
+      <header className="shrink-0 px-5 pt-[calc(env(safe-area-inset-top)+1rem)] pb-3">
+        <h1 className="font-serif text-[2rem] leading-tight font-normal">{handle?.title}</h1>
       </header>
 
       {/* Bandeau du chrono en cours (ticket 4.4) : masqué tant qu'il est vide. */}
       <div data-slot="chrono-banner" className="shrink-0 empty:hidden" />
 
-      <main className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+      <main className="min-h-0 flex-1 overflow-y-auto px-5 pb-6">
         <Outlet />
       </main>
 
@@ -44,7 +44,7 @@ export function Layout() {
                 end={tab.end}
                 className={({ isActive }) =>
                   `flex min-h-14 flex-col items-center justify-center gap-0.5 text-[0.8125rem] ${
-                    isActive ? 'font-semibold text-accent' : 'text-muted'
+                    isActive ? 'font-bold text-accent' : 'text-muted'
                   }`
                 }
               >
