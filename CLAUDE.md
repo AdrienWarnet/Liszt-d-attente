@@ -129,14 +129,15 @@ Après validation du PO : ticket `Fait` dans `docs/suivi.md`, décision éventue
 - `main` = prod, seule branche déployée. Elle ne bouge pas pendant le développement des epics.
 - Une branche par epic, créée depuis `main` : `epic-<n>-<nom-de-l-epic>` (ex : `epic-1-socle-pwa`).
 - Une branche par ticket, créée depuis sa branche d'epic : `ticket-<id>-<nom-du-ticket>` (ex : `ticket-1.1-initialiser-le-projet-et-l-outillage`).
-- Un ticket à la fois. Cycle d'un ticket :
-  1. Coder le ticket, vérifier (build, tests, lint, capture d'écran si UI), puis s'arrêter et demander la validation au PO.
-  2. Après validation : commit + push sur la branche du ticket. Message : `T1.1 – initialiser le projet`.
-  3. Si on reprend le ticket : commits supplémentaires sur la même branche, puis push.
-  4. Ticket validé définitivement : merge en local de `ticket-…` dans `epic-…` avec `git merge --squash` (un seul commit `T1.1 – …` par ticket sur l'epic), puis push de l'epic.
-- Epic validée définitivement : merge en local de `epic-…` dans `main` avec `git merge --no-ff` (message `Epic 1 – …`), push de `main`, puis `npm run deploy` depuis `main`, puis vérification que l'app en ligne est à jour.
+- **Une epic entière d'un coup** (décision PO du 07/11/2026, à partir de l'epic 2) : les tickets s'enchaînent dans l'ordre de `docs/suivi.md` **sans demander de validation par ticket**. Un lot ou un ticket d'une autre epic placé dans l'ordre conseillé (ex. lot 1, 4.1 dans l'epic 2) se fait sur une branche partie de l'epic en cours. Cycle d'un ticket :
+  1. Coder le ticket, vérifier (build, tests, lint, captures d'écran si UI).
+  2. Commit + push sur la branche du ticket. Message : `T2.1 – fonctions de données projets`.
+  3. Merge en local de `ticket-…` dans `epic-…` avec `git merge --squash` (un seul commit `T2.1 – …` par ticket sur l'epic), push de l'epic. Statut du ticket : `À vérifier`.
+- S'arrêter quand même et demander au PO si : une règle métier manque ou se contredit ; un ticket est de type Décision ; une vérification échoue sans correction possible dans le périmètre.
+- **Fin d'epic** : un seul compte rendu pour toute l'epic (format ci-dessus, captures). Le PO vérifie ; les corrections demandées se font en commits supplémentaires sur la branche du ticket concerné, puis nouveau squash dans l'epic.
+- Epic validée par le PO : tickets `Fait`, merge en local de `epic-…` dans `main` avec `git merge --no-ff` (message `Epic 2 – …`), push de `main`, puis `npm run deploy` depuis `main`, puis vérification que l'app en ligne est à jour.
 - Pas de pull request : tout se fait en git local + push.
-- Ne jamais pousser ni merger sans validation explicite du PO.
+- Ne jamais merger dans `main` ni déployer sans validation explicite du PO.
 - Avant de pousser, vérifier le compte : `git config user.email` = `Awarnet1009@gmail.com`, remote `https://AdrienWarnet@github.com/AdrienWarnet/Liszt-d-attente.git`.
 
 ## Contraintes navigateur connues
