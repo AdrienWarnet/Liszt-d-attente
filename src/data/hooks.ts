@@ -6,6 +6,14 @@ import {
   listSectionsWithTasks,
   projectColorMap,
 } from './projects'
+import {
+  getCurrentSession,
+  getRealTimeByTask,
+  getRunningSegment,
+  getSessionView,
+  listHistory,
+} from './sessions'
+import type { Day, Timestamp } from './types'
 
 // Hooks de lecture : se mettent à jour seuls quand la base change.
 // `undefined` = chargement en cours.
@@ -30,4 +38,30 @@ export function useSectionsWithTasks(projectId: string | undefined) {
 
 export function useActiveTasksGrouped() {
   return useLiveQuery(listActiveTasksGrouped)
+}
+
+// ---------- Sessions et temps réel (4.1) ----------
+// `now` change chaque seconde quand un chrono tourne : la requête est relancée.
+
+export function useCurrentSession() {
+  return useLiveQuery(getCurrentSession)
+}
+
+export function useRunningSegment() {
+  return useLiveQuery(getRunningSegment)
+}
+
+export function useSessionView(sessionId: string | undefined, now: Timestamp) {
+  return useLiveQuery(
+    async () => (sessionId ? getSessionView(sessionId, now) : null),
+    [sessionId, now],
+  )
+}
+
+export function useHistory(now: Timestamp) {
+  return useLiveQuery(() => listHistory(now), [now])
+}
+
+export function useRealTimeByTask(days: readonly Day[], now: Timestamp) {
+  return useLiveQuery(() => getRealTimeByTask(days, now), [days.join(','), now])
 }
