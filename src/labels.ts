@@ -3,8 +3,8 @@
 const plural = (n: number, one: string, many: string) => (n > 1 ? many : one)
 
 export const labels = {
-  appName: 'Piano',
-  appFullName: 'Piano — suivi de travail',
+  appName: 'Liszt d’attente',
+  appFullName: 'Liszt d’attente — suivi de travail au piano',
   /** Affiché à la place d'une valeur absente (`null`). */
   emptyValue: '—',
   /** Préfixe du libellé de semaine : « Semaine du 9 nov. ». */
