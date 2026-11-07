@@ -42,6 +42,9 @@ export function ProjectsScreen() {
       <button type="button" className={ui.secondary} onClick={() => setCreating(true)}>
         {labels.projects.newProject}
       </button>
+      <Link to="/revue" className={`${ui.link} mt-2 block`}>
+        {labels.projects.reviewLink}
+      </Link>
 
       {creating && (
         <ProjectFormSheet

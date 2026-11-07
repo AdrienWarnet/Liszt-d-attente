@@ -4,6 +4,7 @@ import { BackupScreen, ReportScreen, SessionScreen, WeekScreen } from './screens
 import { MoreScreen } from './screens/MoreScreen'
 import { ProjectDetailScreen } from './screens/ProjectDetailScreen'
 import { ProjectsScreen } from './screens/ProjectsScreen'
+import { ReviewScreen } from './screens/ReviewScreen'
 
 export const routes: RouteObject[] = [
   {
@@ -13,6 +14,7 @@ export const routes: RouteObject[] = [
       { path: 'semaine', element: <WeekScreen /> },
       { path: 'projets', element: <ProjectsScreen /> },
       { path: 'projets/:id', element: <ProjectDetailScreen /> },
+      { path: 'revue', element: <ReviewScreen /> },
       { path: 'bilan', element: <ReportScreen /> },
       { path: 'plus', element: <MoreScreen /> },
       { path: 'plus/sauvegarde', element: <BackupScreen /> },
