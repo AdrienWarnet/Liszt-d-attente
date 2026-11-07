@@ -297,3 +297,17 @@ describe('bandeau', () => {
     expect(await getBannerState()).toMatchObject({ running: null, resumeTaskId: b.id })
   })
 })
+
+describe('ajouts manuels récents', () => {
+  it('du plus récent au plus ancien, avec la tâche', async () => {
+    const { listManualEntries } = await import('./sessions')
+    const { a, c } = await setup()
+    await addManualEntry(a.id, '2026-11-09', 600)
+    await addManualEntry(c.id, '2026-11-01', 900)
+    const list = await listManualEntries()
+    expect(list.map((x) => [x.context.task.label, x.entry.day])).toEqual([
+      ['Sonatine', '2026-11-01'],
+      ['m. 23-30', '2026-11-09'],
+    ])
+  })
+})

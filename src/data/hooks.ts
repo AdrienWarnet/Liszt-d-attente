@@ -13,6 +13,7 @@ import {
   getRunningSegment,
   getSessionView,
   listHistory,
+  listManualEntries,
 } from './sessions'
 import type { Day, Timestamp, WeekStart } from './types'
 import { getDayOverview, getDayPlan, getWeekOverview } from './week'
@@ -84,4 +85,8 @@ export function useDayPlan(day: Day) {
 
 export function useBannerState(now: Timestamp) {
   return useLiveQuery(() => getBannerState(now), [now])
+}
+
+export function useManualEntries() {
+  return useLiveQuery(() => listManualEntries())
 }
