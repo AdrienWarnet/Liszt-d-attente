@@ -84,9 +84,12 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-:focus-visible {
-  outline: 2px solid var(--color-felt);
-  outline-offset: 2px;
+/* Dans la couche « base » : la classe `outline-none` (feuilles modales) peut l'annuler. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-felt);
+    outline-offset: 2px;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
