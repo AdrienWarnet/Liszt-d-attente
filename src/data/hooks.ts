@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import { getLastExportAt } from './backup'
 import { db } from './db'
 import {
   listActiveTasksGrouped,
@@ -113,4 +114,10 @@ export function useProjectReport(projectId: string | undefined, now: Timestamp) 
     async () => (projectId ? getProjectReport(projectId, now) : null),
     [projectId, now],
   )
+}
+
+// ---------- Sauvegarde (7.1) ----------
+
+export function useLastExportAt() {
+  return useLiveQuery(getLastExportAt)
 }
