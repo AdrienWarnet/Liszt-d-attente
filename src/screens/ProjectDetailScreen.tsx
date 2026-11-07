@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { Screen } from '../components/Screen'
+import { Sheet } from '../components/Sheet'
+import { useToast } from '../components/Toast'
 import { ui } from '../components/ui'
 import { formatDayMonth } from '../data/dates'
 import { useProject, useSectionsWithTasks } from '../data/hooks'
-import { createSection } from '../data/projects'
+import { createSection, deleteProject } from '../data/projects'
 import type { Project } from '../data/types'
 import { labels } from '../labels'
 import { ProjectFormSheet } from './projects/ProjectFormSheet'
@@ -47,9 +49,12 @@ export function ProjectDetailScreen() {
   const data = useProject(id)
   const sections = useSectionsWithTasks(id)
   const [editing, setEditing] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const navigate = useNavigate()
+  const toast = useToast()
 
   if (data === undefined) return <Screen title="" back="/projets" />
-  if (data === null || data.project.deletedAt !== null) {
+  if (data === null || (data.project.deletedAt !== null && !confirmDelete)) {
     return (
       <Screen title={labels.tabs.projects} back="/projets">
         <p className={ui.fact}>{labels.projects.notFound}</p>
@@ -63,6 +68,9 @@ export function ProjectDetailScreen() {
       <div className="mt-1 mb-3.5 flex flex-wrap gap-2">
         <button type="button" className={ui.chip} onClick={() => setEditing(true)}>
           {labels.projects.edit}
+        </button>
+        <button type="button" className={ui.chipDanger} onClick={() => setConfirmDelete(true)}>
+          {labels.projects.delete}
         </button>
       </div>
 
@@ -79,6 +87,20 @@ export function ProjectDetailScreen() {
           onSaved={() => setEditing(false)}
         />
       )}
+
+      <Sheet
+        open={confirmDelete}
+        title={labels.projects.deleteTitle(project.name)}
+        onClose={() => setConfirmDelete(false)}
+        confirmLabel={labels.projects.delete}
+        onConfirm={async () => {
+          await deleteProject(project.id)
+          navigate('/projets', { replace: true })
+          toast(labels.projects.deleted)
+        }}
+      >
+        <p className={`${ui.fact} text-[15px]`}>{labels.projects.deleteText}</p>
+      </Sheet>
     </Screen>
   )
 }
