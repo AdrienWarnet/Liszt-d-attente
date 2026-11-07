@@ -85,3 +85,31 @@ describe('Détail projet', () => {
     expect((await db.tasks.get(t.id))?.label).toBe('m. 23-30')
   })
 })
+
+describe('Supprimer un projet', () => {
+  it('Annuler ne change rien', async () => {
+    const p = await createProject({ name: 'Sonate' })
+    renderApp(`/projets/${p.id}`)
+    await userEvent.click(await screen.findByRole('button', { name: labels.projects.delete }))
+    const dialog = screen.getByRole('dialog', { name: labels.projects.deleteTitle('Sonate') })
+    expect(dialog).toHaveTextContent(labels.projects.deleteText)
+    await userEvent.click(within(dialog).getByRole('button', { name: labels.common.cancel }))
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect((await db.projects.get(p.id))?.deletedAt).toBeNull()
+  })
+
+  it('Supprimer ramène à Projets, sans le projet, qui reste en base', async () => {
+    const p = await createProject({ name: 'Sonate' })
+    const s = await createSection(p.id, 'Mvt 2')
+    await createTask(s.id, 'Exposition')
+    const router = renderApp(`/projets/${p.id}`)
+    await userEvent.click(await screen.findByRole('button', { name: labels.projects.delete }))
+    const dialog = screen.getByRole('dialog')
+    await userEvent.click(within(dialog).getByRole('button', { name: labels.projects.delete }))
+    expect(await screen.findByRole('status')).toHaveTextContent(labels.projects.deleted)
+    expect(router.state.location.pathname).toBe('/projets')
+    expect(await screen.findByText(labels.projects.empty)).toBeInTheDocument()
+    expect((await db.projects.get(p.id))?.deletedAt).toEqual(expect.any(Number))
+    expect(await db.tasks.count()).toBe(1)
+  })
+})
