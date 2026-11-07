@@ -82,6 +82,54 @@ export const labels = {
     empty: 'Aucun projet pour l’instant.',
   },
 
+  gap: {
+    budget: { above: 'au-dessus du budget', below: 'sous le budget', even: 'pile dans le budget' },
+    planned: { above: 'au-dessus du prévu', below: 'sous le prévu', even: 'pile dans le prévu' },
+  },
+
+  duration: {
+    invalid: 'Durée non comprise : écris 45 ou 1:30',
+  },
+
+  week: {
+    previous: 'Semaine précédente',
+    next: 'Semaine suivante',
+    progress: 'Avancement',
+    enterBudget: 'Saisis ton budget jour par jour ci-dessous.',
+    real: (gap: string) => `Réel ${gap}`,
+    dailyBudgets: 'Budget de chaque jour',
+    today: 'aujourd’hui',
+    dayLine: (real: string, taskCount: number) =>
+      taskCount > 0
+        ? `Réel ${real} · ${taskCount} ${plural(taskCount, 'tâche', 'tâches')}`
+        : `Réel ${real}`,
+    dayDetail: (day: string) => `Détail du ${day}`,
+    budgetOf: (day: string) => `Budget du ${day}`,
+    weekBudget: 'Budget de la semaine',
+    plannedByProject: 'Temps prévu par projet',
+    plannedOf: (project: string) => `Temps prévu ${project}`,
+    projectReal: (real: string) => `Réel ${real}`,
+    plannedTotal: 'Total prévu',
+    weekBudgetSmall: (budget: string) => `Budget de la semaine ${budget}`,
+    ofTheWeek: (gap: string) => `${gap} de la semaine`,
+    review: 'Revue de semaine',
+  },
+
+  day: {
+    budget: 'Budget',
+    real: 'Réel',
+    plannedTasks: 'Tâches prévues',
+    noPlannedTasks: 'Aucune tâche prévue ce jour.',
+    planTasks: '+ Prévoir des tâches',
+    planTitle: (day: string) => `Prévoir ${day}`,
+    planned: (duration: string) => `Prévu ${duration}`,
+    plannedOf: (task: string) => `Temps prévu ${task}`,
+    unplan: (task: string) => `Retirer ${task}`,
+    archived: '(archivée)',
+    deleted: '(supprimé)',
+    keyLabel: (day: string) => `Voir le ${day}`,
+  },
+
   errors: {
     nameRequired: 'Donne un nom au projet.',
     endBeforeStart: 'La date de fin doit être après la date de début.',
