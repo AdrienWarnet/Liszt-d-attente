@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatDuration, parseDuration, sumNullable } from './durations'
+import { formatClock, formatDuration, parseDuration, sumNullable } from './durations'
 
 describe('formatDuration', () => {
   it('valeur absente (null) → « — »', () => {
@@ -92,5 +92,13 @@ describe('sumNullable', () => {
 
   it('un zéro saisi compte comme une valeur', () => {
     expect(sumNullable([null, 0])).toBe(0)
+  })
+})
+
+describe('formatClock', () => {
+  it('h:mm:ss pour un chrono en cours', () => {
+    expect(formatClock(0)).toBe('0:00:00')
+    expect(formatClock(754)).toBe('0:12:34')
+    expect(formatClock(3600 + 59.9)).toBe('1:00:59')
   })
 })

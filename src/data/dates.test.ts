@@ -6,6 +6,7 @@ import {
   formatDayMonth,
   formatDayShort,
   formatDayTitle,
+  formatTimeOfDay,
   formatWeekdayShort,
   formatWeekLabel,
   parseDay,
@@ -130,6 +131,11 @@ describe('libellés', () => {
     expect(formatDayShort('2026-11-09')).toBe('lun. 9')
     expect(formatWeekdayShort('2026-11-15')).toBe('dim')
     expect(formatDayTitle('2026-11-09')).toBe('Lundi 9 nov.')
+  })
+
+  it('formatTimeOfDay', () => {
+    expect(formatTimeOfDay(Date.UTC(2026, 10, 9, 17, 42))).toBe('18:42')
+    expect(formatTimeOfDay(Date.UTC(2026, 10, 9, 8, 5))).toBe('9:05')
   })
 
   it('formatDayMonth', () => {

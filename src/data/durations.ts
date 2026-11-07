@@ -41,3 +41,10 @@ export function sumNullable(values: readonly (number | null)[]): number | null {
   }
   return total
 }
+
+/** Chrono en cours : `h:mm:ss` (ex. `0:12:34`), secondes tronquées. */
+export function formatClock(sec: DurationSec): string {
+  const s = Math.max(0, Math.floor(sec))
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${Math.floor(s / 3600)}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)}`
+}
