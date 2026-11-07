@@ -102,3 +102,61 @@ describe('Onglet Semaine', () => {
     expect(router.state.location.pathname).toBe('/revue')
   })
 })
+
+describe('Temps prévu par projet', () => {
+  async function setup() {
+    const a = await createProject({ name: 'Ballade' })
+    await createProject({ name: 'Déchiffrage' })
+    const days = ['2026-11-09', '2026-11-10', '2026-11-11', '2026-11-12', '2026-11-13']
+    for (const day of days) await db.dailyBudgets.put({ day, durationSec: 6840 }) // 5 × 1:54 = 9:30
+    return a
+  }
+  const total = () => screen.getByTestId('planned-total')
+
+  async function typePlanned(project: string, text: string) {
+    const input = await screen.findByLabelText(labels.week.plannedOf(project))
+    await userEvent.click(input)
+    await userEvent.clear(input)
+    if (text) await userEvent.type(input, text)
+    await userEvent.tab()
+  }
+
+  it('projet sans saisie « — », absent du total ; pas de phrase si total null', async () => {
+    await setup()
+    renderApp('/semaine')
+    expect(await screen.findByLabelText(labels.week.plannedOf('Ballade'))).toHaveValue('')
+    expect(total()).toHaveTextContent('—')
+    expect(screen.queryByText(/(sous|au-dessus|pile).* de la semaine$/)).toBeNull()
+    await typePlanned('Ballade', '4:00')
+    await vi.waitFor(() => expect(total()).toHaveTextContent('4:00'))
+    expect(screen.getByText('5:30 sous le budget de la semaine')).toBeInTheDocument()
+  })
+
+  it('prévu 10:00 pour 9:30 de budget : case et phrase en rouge avec ▲ ; 9:00 : aucun rouge', async () => {
+    await setup()
+    renderApp('/semaine')
+    await typePlanned('Ballade', '6:00')
+    await typePlanned('Déchiffrage', '4:00')
+    await vi.waitFor(() => expect(total()).toHaveTextContent('10:00'))
+    expect(total()).toHaveAttribute('data-over')
+    const phrase = screen.getByText('▲ 0:30 au-dessus du budget de la semaine')
+    expect(phrase).toHaveClass('text-over')
+
+    await typePlanned('Déchiffrage', '3:00')
+    await vi.waitFor(() => expect(total()).toHaveTextContent('9:00'))
+    expect(total()).not.toHaveAttribute('data-over')
+    expect(document.querySelector('.text-over')).toBeNull()
+    expect(screen.getByText('0:30 sous le budget de la semaine')).toBeInTheDocument()
+  })
+
+  it('la barre du projet compare son réel à son prévu', async () => {
+    const p = await setup()
+    const s = await createSection(p.id, 'Page 1')
+    const t = await createTask(s.id, 'Lignes')
+    await addManualEntry(t.id, '2026-11-10', 3600)
+    renderApp('/semaine')
+    const input = await screen.findByLabelText(labels.week.plannedOf('Ballade'))
+    const row = input.parentElement!
+    await vi.waitFor(() => expect(row).toHaveTextContent('Réel 1:00'))
+  })
+})
