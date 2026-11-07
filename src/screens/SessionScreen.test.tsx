@@ -121,3 +121,76 @@ describe('Démarrer une session (4.2)', () => {
     expect(await within(sheet()).findByRole('checkbox', { name: 'm. 23-30' })).toBeChecked()
   })
 })
+
+describe('Session en cours (4.3)', () => {
+  async function running() {
+    const { a, b } = await setup()
+    const { startSession, setSessionTasks } = await import('../data/sessions')
+    const s = await startSession()
+    await setSessionTasks(s.id, [a.id, b.id])
+    return s
+  }
+  const row = (label: string) => screen.getByText(label).closest('div.relative') as HTMLElement
+  const at = (min: number) => vi.setSystemTime(Date.UTC(2026, 10, 9, 17, 42 + min))
+
+  it('lancer A, attendre, lancer B : A s’arrête, B tourne ; durées en h:mm:ss', async () => {
+    await running()
+    renderApp('/')
+    expect(await screen.findByText(labels.session.startedAt('18:42'))).toBeInTheDocument()
+    expect(screen.getByText(labels.session.taskCount(2))).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: labels.session.play('m. 23-30') }))
+    expect(
+      await screen.findByRole('button', { name: labels.session.pause('m. 23-30') }),
+    ).toBeInTheDocument()
+    at(10)
+    await userEvent.click(screen.getByRole('button', { name: labels.session.play('m. 45-52') }))
+    expect(
+      await screen.findByRole('button', { name: labels.session.pause('m. 45-52') }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: labels.session.play('m. 23-30') }),
+    ).toBeInTheDocument()
+    at(12)
+    await vi.waitFor(() => expect(row('m. 45-52')).toHaveTextContent('0:02:00'), { timeout: 3000 })
+    expect(row('m. 23-30')).toHaveTextContent('0:10:00')
+    expect(row('m. 45-52')).toHaveAttribute('data-running')
+    expect(screen.getByLabelText(labels.session.total)).toHaveTextContent('0:12:00')
+    expect((await db.timeSegments.toArray()).filter((s) => s.endedAt === null)).toHaveLength(1)
+  })
+
+  it('écran verrouillé 2 min, app fermée puis rouverte : le chrono a avancé de 2 min', async () => {
+    await running()
+    renderApp('/')
+    await userEvent.click(
+      await screen.findByRole('button', { name: labels.session.play('m. 23-30') }),
+    )
+    await screen.findByRole('button', { name: labels.session.pause('m. 23-30') })
+    cleanup() // l'app est tuée
+    at(2)
+    renderApp('/')
+    await vi.waitFor(() => expect(row('m. 23-30')).toHaveTextContent('0:02:00'))
+    expect(
+      screen.getByRole('button', { name: labels.session.pause('m. 23-30') }),
+    ).toBeInTheDocument()
+  })
+
+  it('pause, puis terminer : confirmation avec la durée, chrono fermé, message', async () => {
+    await running()
+    renderApp('/')
+    await userEvent.click(
+      await screen.findByRole('button', { name: labels.session.play('m. 23-30') }),
+    )
+    await screen.findByRole('button', { name: labels.session.pause('m. 23-30') })
+    at(72)
+    await userEvent.click(screen.getByRole('button', { name: labels.session.end }))
+    const confirm = screen.getByRole('dialog', { name: labels.session.endTitle })
+    await vi.waitFor(() => expect(confirm).toHaveTextContent(labels.session.endText('1:12')))
+    await userEvent.click(within(confirm).getByRole('button', { name: labels.session.endConfirm }))
+    expect(await screen.findByRole('status')).toHaveTextContent(labels.session.saved)
+    expect(
+      await screen.findByRole('button', { name: new RegExp(labels.session.start) }),
+    ).toBeInTheDocument()
+    expect((await db.timeSegments.toArray()).every((s) => s.endedAt !== null)).toBe(true)
+    expect((await db.sessions.toArray())[0].endedAt).not.toBeNull()
+  })
+})
