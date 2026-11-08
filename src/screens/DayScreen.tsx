@@ -136,21 +136,7 @@ export function DayScreen() {
               onCommit={(v) => setDailyBudget(day, v)}
             />
           </div>
-          {/* Lot 8 : total du jour « Prévu · Réel · Budget » avec écarts.
-              Rouge seulement pour le prévu au-dessus du budget (R12). */}
-          <div className="flex items-center justify-between gap-3 py-1.5" data-testid="day-planned">
-            <span>{labels.day.plannedTotal}</span>
-            <span className="text-right">
-              <span className="font-semibold tabular-nums">{formatDuration(overview.planned)}</span>
-              {plannedGap && (
-                <small
-                  className={`block text-xs ${overview.plannedOverBudget ? 'font-bold text-over' : 'text-muted'}`}
-                >
-                  {overview.plannedOverBudget ? `▲ ${plannedGap}` : plannedGap}
-                </small>
-              )}
-            </span>
-          </div>
+          {/* Lot 8 (revu par le PO) : la carte ne montre que Budget et Réel, avec l'écart du réel. */}
           <div className="flex items-center justify-between gap-3 py-1.5" data-testid="day-real">
             <span>{labels.day.real}</span>
             <span className="text-right">
@@ -203,6 +189,20 @@ export function DayScreen() {
       <button type="button" className={`${ui.link} block`} onClick={() => setPlanning(true)}>
         {labels.day.planTasks}
       </button>
+
+      {/* Prévu du jour face au budget : seul cas en rouge (R12). */}
+      {overview && (overview.planned !== null || plannedGap) && (
+        <p className={ui.fact} data-testid="day-facts">
+          {overview.planned !== null && labels.day.planned(formatDuration(overview.planned))}
+          {overview.planned !== null && plannedGap && ' · '}
+          {plannedGap &&
+            (overview.plannedOverBudget ? (
+              <span className="font-bold text-over">▲ {plannedGap}</span>
+            ) : (
+              plannedGap
+            ))}
+        </p>
+      )}
 
       {/* Lot 7 : tâches travaillées ce jour sans être prévues (statut recalculé à chaque affichage). */}
       {dayTasks && dayTasks.unplanned.length > 0 && (
