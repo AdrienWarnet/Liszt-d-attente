@@ -91,6 +91,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | Lot 8 | `lot-8-total-prevu-fait-budget` | Retours d'Adele : vue Jour, carte « Budget · Réel » avec l'écart du réel (la ligne Prévu dans la carte a été retirée par le PO) ; le prévu face au budget reste en bas, rouge si au-dessus. Lot séparé, annulable seul. | CC | Fait | — |
 | Lot 9 | `lot-9-reste-sur-le-budget` | Retours d'Adele : « Reste 0:40 » (budget − réel) sur le jour (vue Jour, lignes de l'onglet Semaine) et la semaine (Avancement) ; au-delà : constat « au-dessus du budget ». Lot séparé, annulable seul. | CC | Fait | — |
 | — | — | Idée d'Adele, plus tard : vue calendrier de la semaine sur l'onglet Semaine. | — | À planifier | — |
+| — | — | Idée du PO, plus tard : corriger un chrono à la main pendant la session en cours (oubli de démarrer ou d'arrêter). Aujourd'hui : correction seulement après la session, dans Historique. | — | À planifier | — |
 
 ## Hypothèses à vérifier
 | # | Hypothèse | Quand | Résultat |
