@@ -68,7 +68,7 @@ describe('Vue Jour', () => {
     expect(screen.getByText('Passages')).toBeInTheDocument()
   })
 
-  it('prévu 2:15 pour 1:30 de budget : « ▲ 0:45 au-dessus du budget » en rouge (lot 8 : dans la carte)', async () => {
+  it('prévu 2:15 pour 1:30 de budget : « ▲ 0:45 au-dessus du budget » en rouge', async () => {
     const { a, b } = await setup()
     await db.dailyBudgets.put({ day: DAY, durationSec: 5400 })
     await db.taskDayPlans.bulkPut([
@@ -76,16 +76,18 @@ describe('Vue Jour', () => {
       { taskId: b.id, day: DAY, durationSec: 4500 },
     ])
     renderApp(`/semaine/jour/${DAY}`)
-    const planned = await screen.findByTestId('day-planned')
-    await vi.waitFor(() => expect(planned).toHaveTextContent('2:15▲ 0:45 au-dessus du budget'))
-    expect(within(planned).getByText('▲ 0:45 au-dessus du budget')).toHaveClass('text-over')
+    const facts = await screen.findByTestId('day-facts')
+    await vi.waitFor(() =>
+      expect(facts).toHaveTextContent('Prévu 2:15 · ▲ 0:45 au-dessus du budget'),
+    )
+    expect(within(facts).getByText('▲ 0:45 au-dessus du budget')).toHaveClass('text-over')
 
     const input = screen.getByLabelText(labels.day.plannedOf('m. 45-52'))
     await userEvent.click(input)
     await userEvent.clear(input)
     await userEvent.type(input, '15{Enter}')
     await vi.waitFor(() =>
-      expect(screen.getByTestId('day-planned')).toHaveTextContent('1:150:15 sous le budget'),
+      expect(screen.getByTestId('day-facts')).toHaveTextContent('Prévu 1:15 · 0:15 sous le budget'),
     )
     expect(document.querySelector('.text-over')).toBeNull()
   })
@@ -159,7 +161,7 @@ describe('Vue Jour : fait et imprévues (lot 7)', () => {
   })
 })
 
-describe('Vue Jour : total Prévu · Réel · Budget (lot 8)', () => {
+describe('Vue Jour : carte Budget · Réel (lot 8, revu par le PO)', () => {
   it('le réel compte les imprévues ; son écart reste neutre même au-dessus du budget', async () => {
     const { addManualEntry } = await import('../data/sessions')
     const { a, c } = await setup()
@@ -171,6 +173,6 @@ describe('Vue Jour : total Prévu · Réel · Budget (lot 8)', () => {
     const real = await screen.findByTestId('day-real')
     await vi.waitFor(() => expect(real).toHaveTextContent('1:100:10 au-dessus du budget'))
     expect(real.querySelector('.text-over')).toBeNull()
-    expect(screen.getByTestId('day-planned')).toHaveTextContent('0:300:30 sous le budget')
+    expect(screen.queryByTestId('day-planned')).toBeNull() // carte : Budget et Réel seulement
   })
 })
