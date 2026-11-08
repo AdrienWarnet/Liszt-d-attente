@@ -175,6 +175,11 @@ export const labels = {
     archived: '(archivée)',
     deleted: '(supprimé)',
     keyLabel: (day: string) => `Voir le ${day}`,
+    done: (duration: string) => `fait ${duration}`,
+    unplanned: 'Imprévues',
+    unplannedHint: 'Travaillées ce jour sans être prévues.',
+    addToPlan: 'Ajouter au prévu',
+    addToPlanLabel: (task: string) => `Ajouter ${task} au prévu`,
   },
 
   session: {

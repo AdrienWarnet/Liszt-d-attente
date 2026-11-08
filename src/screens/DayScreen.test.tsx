@@ -124,3 +124,37 @@ describe('Vue Jour', () => {
     await vi.waitFor(() => expect(row).toHaveTextContent('Réel — · 2 tâches'))
   })
 })
+
+describe('Vue Jour : fait et imprévues (lot 7)', () => {
+  it('« fait » sous la tâche prévue ; imprévue listée ; « Ajouter au prévu » la passe dans les prévues', async () => {
+    const { addManualEntry } = await import('../data/sessions')
+    const { a, c } = await setup()
+    await db.taskDayPlans.put({ taskId: a.id, day: DAY, durationSec: 3600 })
+    await addManualEntry(a.id, DAY, 2700)
+    await addManualEntry(c.id, DAY, 1200)
+    renderApp(`/semaine/jour/${DAY}`)
+    const plannedInput = await screen.findByLabelText(labels.day.plannedOf('m. 23-30'))
+    expect(plannedInput.closest('div.flex')).toHaveTextContent(
+      `Passages · ${labels.day.done('0:45')}`,
+    )
+    const unplanned = await screen.findByRole('region', { name: labels.day.unplanned })
+    expect(unplanned).toHaveTextContent('Sonatine')
+    expect(unplanned).toHaveTextContent(`Clementi · ${labels.day.done('0:20')}`)
+
+    await userEvent.click(
+      within(unplanned).getByRole('button', { name: labels.day.addToPlanLabel('Sonatine') }),
+    )
+    expect(await screen.findByLabelText(labels.day.plannedOf('Sonatine'))).toHaveValue('')
+    await vi.waitFor(() =>
+      expect(screen.queryByRole('region', { name: labels.day.unplanned })).toBeNull(),
+    )
+    expect(await db.taskDayPlans.get([c.id, DAY])).toMatchObject({ durationSec: null })
+  })
+
+  it('sans tâche imprévue : pas de bloc « Imprévues »', async () => {
+    await setup()
+    renderApp(`/semaine/jour/${DAY}`)
+    await screen.findByText(labels.day.noPlannedTasks)
+    expect(screen.queryByRole('region', { name: labels.day.unplanned })).toBeNull()
+  })
+})
