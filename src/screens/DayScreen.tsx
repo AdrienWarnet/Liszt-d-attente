@@ -116,7 +116,9 @@ export function DayScreen() {
 
   if (!valid) return <Navigate to="/semaine" replace />
 
-  const gap = overview && formatGap(overview.planned, overview.budget)
+  const plannedGap = overview && formatGap(overview.planned, overview.budget)
+  // Le réel du jour compte les tâches prévues ET imprévues.
+  const realGap = overview && formatGap(overview.real, overview.budget)
   const plannedIds = plan?.flatMap((g) => g.items.map((i) => i.task.id)) ?? []
 
   return (
@@ -133,9 +135,13 @@ export function DayScreen() {
               onCommit={(v) => setDailyBudget(day, v)}
             />
           </div>
-          <div className="flex items-center justify-between gap-3 py-1.5">
+          {/* Lot 8 (revu par le PO) : la carte ne montre que Budget et Réel, avec l'écart du réel. */}
+          <div className="flex items-center justify-between gap-3 py-1.5" data-testid="day-real">
             <span>{labels.day.real}</span>
-            <span className="font-semibold tabular-nums">{formatDuration(overview.real)}</span>
+            <span className="text-right">
+              <span className="font-semibold tabular-nums">{formatDuration(overview.real)}</span>
+              {realGap && <small className="block text-xs text-muted">{realGap}</small>}
+            </span>
           </div>
           <div className="pb-1.5">
             <Bar value={overview.real} reference={overview.budget} />
@@ -183,6 +189,20 @@ export function DayScreen() {
         {labels.day.planTasks}
       </button>
 
+      {/* Prévu du jour face au budget : seul cas en rouge (R12). */}
+      {overview && (overview.planned !== null || plannedGap) && (
+        <p className={ui.fact} data-testid="day-facts">
+          {overview.planned !== null && labels.day.planned(formatDuration(overview.planned))}
+          {overview.planned !== null && plannedGap && ' · '}
+          {plannedGap &&
+            (overview.plannedOverBudget ? (
+              <span className="font-bold text-over">▲ {plannedGap}</span>
+            ) : (
+              plannedGap
+            ))}
+        </p>
+      )}
+
       {/* Lot 7 : tâches travaillées ce jour sans être prévues (statut recalculé à chaque affichage). */}
       {dayTasks && dayTasks.unplanned.length > 0 && (
         <section aria-label={labels.day.unplanned}>
@@ -216,21 +236,6 @@ export function DayScreen() {
             </div>
           ))}
         </section>
-      )}
-
-      {overview && (overview.planned !== null || gap) && (
-        <p className={ui.fact} data-testid="day-facts">
-          {[overview.planned !== null && labels.day.planned(formatDuration(overview.planned))]
-            .filter(Boolean)
-            .join('')}
-          {overview.planned !== null && gap && ' · '}
-          {gap &&
-            (overview.plannedOverBudget ? (
-              <span className="font-bold text-over">▲ {gap}</span>
-            ) : (
-              gap
-            ))}
-        </p>
       )}
 
       {planning && <PlanSheet day={day} planned={plannedIds} onClose={() => setPlanning(false)} />}

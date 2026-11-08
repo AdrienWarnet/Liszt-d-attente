@@ -77,7 +77,9 @@ describe('Vue Jour', () => {
     ])
     renderApp(`/semaine/jour/${DAY}`)
     const facts = await screen.findByTestId('day-facts')
-    expect(facts).toHaveTextContent('Prévu 2:15 · ▲ 0:45 au-dessus du budget')
+    await vi.waitFor(() =>
+      expect(facts).toHaveTextContent('Prévu 2:15 · ▲ 0:45 au-dessus du budget'),
+    )
     expect(within(facts).getByText('▲ 0:45 au-dessus du budget')).toHaveClass('text-over')
 
     const input = screen.getByLabelText(labels.day.plannedOf('m. 45-52'))
@@ -156,5 +158,21 @@ describe('Vue Jour : fait et imprévues (lot 7)', () => {
     renderApp(`/semaine/jour/${DAY}`)
     await screen.findByText(labels.day.noPlannedTasks)
     expect(screen.queryByRole('region', { name: labels.day.unplanned })).toBeNull()
+  })
+})
+
+describe('Vue Jour : carte Budget · Réel (lot 8, revu par le PO)', () => {
+  it('le réel compte les imprévues ; son écart reste neutre même au-dessus du budget', async () => {
+    const { addManualEntry } = await import('../data/sessions')
+    const { a, c } = await setup()
+    await db.dailyBudgets.put({ day: DAY, durationSec: 3600 })
+    await db.taskDayPlans.put({ taskId: a.id, day: DAY, durationSec: 1800 })
+    await addManualEntry(a.id, DAY, 1800)
+    await addManualEntry(c.id, DAY, 2400) // imprévue
+    renderApp(`/semaine/jour/${DAY}`)
+    const real = await screen.findByTestId('day-real')
+    await vi.waitFor(() => expect(real).toHaveTextContent('1:100:10 au-dessus du budget'))
+    expect(real.querySelector('.text-over')).toBeNull()
+    expect(screen.queryByTestId('day-planned')).toBeNull() // carte : Budget et Réel seulement
   })
 })
