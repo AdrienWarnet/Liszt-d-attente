@@ -1,6 +1,6 @@
 # Suivi — Adele / Suivi de travail piano
 
-Statuts : `À faire` · `En cours` · `Bloqué` · `À vérifier` (fini par CC, en attente de la vérification de fin d'epic) · `Fait`. Seul le PO passe un ticket en `Fait`.
+Statuts : `À faire` · `En cours` · `Bloqué` · `Abandonné` (décision PO) · `À vérifier` (fini par CC, en attente de la vérification de fin d'epic) · `Fait`. Seul le PO passe un ticket en `Fait`.
 Qui : PO · CC (Claude Code) · Adele
 
 Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 → 2.5, 4.1 → 2.6, 3.1 → 3.4, 4.2 → 4.6, 5.1 → 5.2, 6.2 → 6.5 (6.1 en parallèle), 7.1 → 7.3. 4.1 passe avant 3.1 : l’onglet Semaine affiche le temps réel.
@@ -69,8 +69,8 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 ## Epics P2 (après démo MVP)
 | # | Ticket | Type | Qui | Dépend de | Statut |
 |---|---|---|---|---|---|
-| 8.1 | Mode concentration | Front | CC | 4.3 | À faire |
-| 8.2 | Rappel Ne pas déranger | Front | CC | 4.2, 8.1 | À faire |
+| 8.1 | Mode concentration | Front | CC | 4.3 | Abandonné |
+| 8.2 | Rappel Ne pas déranger | Front | CC | 4.2, 8.1 | Abandonné |
 | 9.1 | Exemples de photos et volume | Décision | PO + Adele | — | À faire |
 | 9.2 | Fonctions données photos (schéma v2) | Donnée | CC | 9.1, 7.1 | À faire |
 | 9.3 | Prendre et consulter les photos | Front | CC | 9.2, 2.3 | À faire |
@@ -143,3 +143,4 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | 07/11/2026 | Nom de l'app : « Liszt d’attente » (remplace « Piano ») ; noms internes (base `piano`) inchangés pour ne pas perdre les données | Demande PO | Lot 4, manifest |
 | 07/11/2026 | Sauvegarde : la date de dernière sauvegarde n'est mise à jour qu'une fois le fichier partagé ou téléchargé ; après une restauration, elle prend la date du fichier | Ne pas afficher « sauvegardé » si le partage est annulé | 7.1, 7.2 |
 | 07/11/2026 | Saisie des sections et tâches dans un écran d'édition avec bouton « Enregistrer » ; archivage d'une tâche déplacé dans cet écran ; plus de saisie directe dans le détail du projet | Demande PO : tâches perdues (Entrée seule pour valider, ✕ et « Archiver » à un toucher) | Lot 5, remplace la saisie de 2.2, 2.3, 2.5 |
+| 08/11/2026 | Epic 8 (mode concentration, rappel Ne pas déranger) abandonnée | Pas un besoin (PO) | 8.1, 8.2 |
