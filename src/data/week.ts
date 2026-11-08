@@ -236,3 +236,54 @@ export async function getDayOverview(day: Day, now: Timestamp): Promise<DayOverv
     plannedOverBudget: isPlannedOverBudget(planned, budget),
   }
 }
+
+// ---------- Vue Jour : fait et imprévues (lot 7) ----------
+
+export interface DayTask extends TaskContext {
+  /** Temps prévu (`null` = prévue sans durée, ou imprévue). */
+  plannedSec: DurationSec | null
+  /** Temps fait ce jour-là (chronos + ajouts manuels), `null` si rien. */
+  realSec: DurationSec | null
+  archived: boolean
+}
+
+export interface DayTasks {
+  planned: ProjectGroup<DayTask>[]
+  /** Tâches travaillées ce jour sans être prévues. Statut recalculé : prévue ensuite → passe dans `planned`. */
+  unplanned: ProjectGroup<DayTask>[]
+}
+
+const byPosition = (a: DayTask, b: DayTask) =>
+  a.project.createdAt - b.project.createdAt ||
+  a.section.order - b.section.order ||
+  a.task.createdAt - b.task.createdAt
+
+export async function getDayTasks(day: Day, now: Timestamp): Promise<DayTasks> {
+  const plans = await db.taskDayPlans.where('day').equals(day).toArray()
+  const realByTask = new Map<string, DurationSec>()
+  for (const e of await listRealEntries([day], now)) {
+    realByTask.set(e.taskId, (realByTask.get(e.taskId) ?? 0) + e.durationSec)
+  }
+  const plannedIds = new Set(plans.map((p) => p.taskId))
+  const unplannedIds = [...realByTask.keys()].filter((id) => !plannedIds.has(id))
+  const contexts = await taskContexts([...plannedIds, ...unplannedIds])
+  const line = (taskId: string, plannedSec: DurationSec | null): DayTask | null => {
+    const ctx = contexts.get(taskId)
+    if (!ctx) return null
+    return {
+      ...ctx,
+      plannedSec,
+      realSec: realByTask.get(taskId) ?? null,
+      archived: ctx.task.status === 'archived',
+    }
+  }
+  const planned = plans
+    .map((p) => line(p.taskId, p.durationSec))
+    .filter((x): x is DayTask => !!x)
+    .sort(byPosition)
+  const unplanned = unplannedIds
+    .map((id) => line(id, null))
+    .filter((x): x is DayTask => !!x)
+    .sort(byPosition)
+  return { planned: groupByProject(planned), unplanned: groupByProject(unplanned) }
+}

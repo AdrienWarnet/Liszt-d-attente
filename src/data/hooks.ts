@@ -19,7 +19,7 @@ import {
 import { getProjectPlanning } from './planning'
 import { getProjectReport, getWeeklyReport } from './report'
 import type { Day, Timestamp, WeekStart } from './types'
-import { getDayOverview, getDayPlan, getWeekOverview } from './week'
+import { getDayOverview, getDayPlan, getDayTasks, getWeekOverview } from './week'
 
 // Hooks de lecture : se mettent à jour seuls quand la base change.
 // `undefined` = chargement en cours.
@@ -120,4 +120,8 @@ export function useProjectReport(projectId: string | undefined, now: Timestamp) 
 
 export function useLastExportAt() {
   return useLiveQuery(getLastExportAt)
+}
+
+export function useDayTasks(day: Day, now: Timestamp) {
+  return useLiveQuery(() => getDayTasks(day, now), [day, now])
 }

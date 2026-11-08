@@ -19,7 +19,7 @@ import {
   weekStart,
 } from '../data/dates'
 import { formatDuration } from '../data/durations'
-import { useActiveTasksGrouped, useDayOverview, useDayPlan, useWeekOverview } from '../data/hooks'
+import { useActiveTasksGrouped, useDayOverview, useDayTasks, useWeekOverview } from '../data/hooks'
 import type { Day } from '../data/types'
 import {
   formatGap,
@@ -110,7 +110,8 @@ export function DayScreen() {
   const now = useNow(30_000)
   const week = useWeekOverview(ws, now)
   const overview = useDayOverview(day, now)
-  const plan = useDayPlan(day)
+  const dayTasks = useDayTasks(day, now)
+  const plan = dayTasks?.planned
   const [planning, setPlanning] = useState(false)
 
   if (!valid) return <Navigate to="/semaine" replace />
@@ -147,7 +148,7 @@ export function DayScreen() {
       {plan?.map((group) => (
         <div key={group.project.id}>
           <ProjectGroupHeader project={group.project} color={group.color} />
-          {group.items.map(({ task, section, durationSec, archived }, i) => (
+          {group.items.map(({ task, section, plannedSec: durationSec, realSec, archived }, i) => (
             <div
               key={task.id}
               className={`flex items-center gap-2.5 py-2.5 text-sm ${i ? 'border-t border-line' : ''}`}
@@ -155,7 +156,10 @@ export function DayScreen() {
               <div className="min-w-0 flex-1">
                 {task.label}
                 {archived && <span className="text-muted"> {labels.day.archived}</span>}
-                <div className={ui.crumb}>{section.name}</div>
+                <div className={ui.crumb}>
+                  {section.name}
+                  {realSec !== null && ` · ${labels.day.done(formatDuration(realSec))}`}
+                </div>
               </div>
               <DurationInput
                 value={durationSec}
@@ -178,6 +182,41 @@ export function DayScreen() {
       <button type="button" className={`${ui.link} block`} onClick={() => setPlanning(true)}>
         {labels.day.planTasks}
       </button>
+
+      {/* Lot 7 : tâches travaillées ce jour sans être prévues (statut recalculé à chaque affichage). */}
+      {dayTasks && dayTasks.unplanned.length > 0 && (
+        <section aria-label={labels.day.unplanned}>
+          <p className={ui.label}>{labels.day.unplanned}</p>
+          <p className={ui.fact}>{labels.day.unplannedHint}</p>
+          {dayTasks.unplanned.map((group) => (
+            <div key={group.project.id}>
+              <ProjectGroupHeader project={group.project} color={group.color} />
+              {group.items.map(({ task, section, realSec, archived }, i) => (
+                <div
+                  key={task.id}
+                  className={`flex items-center gap-2.5 py-2.5 text-sm ${i ? 'border-t border-line' : ''}`}
+                >
+                  <div className="min-w-0 flex-1">
+                    {task.label}
+                    {archived && <span className="text-muted"> {labels.day.archived}</span>}
+                    <div className={ui.crumb}>
+                      {section.name} · {labels.day.done(formatDuration(realSec))}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="min-h-11 shrink-0 rounded-lg px-2 text-xs font-semibold text-felt"
+                    aria-label={labels.day.addToPlanLabel(task.label)}
+                    onClick={() => planTaskOnDay(task.id, day, null)}
+                  >
+                    {labels.day.addToPlan}
+                  </button>
+                </div>
+              ))}
+            </div>
+          ))}
+        </section>
+      )}
 
       {overview && (overview.planned !== null || gap) && (
         <p className={ui.fact} data-testid="day-facts">

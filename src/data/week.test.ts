@@ -194,3 +194,41 @@ describe('vue semaine', () => {
     ])
   })
 })
+
+describe('vue Jour : fait et imprévues (lot 7)', () => {
+  it('fait sur les tâches prévues ; imprévues = travaillées sans être prévues ; prévue ensuite → plus imprévue', async () => {
+    const { getDayTasks } = await import('./week')
+    const { a, b, c } = await setup()
+    await planTaskOnDay(a.id, WEEK, 3600)
+    await addManualEntry(a.id, WEEK, 2700)
+    await addManualEntry(c.id, WEEK, 1200)
+    await addManualEntry(b.id, '2026-11-10', 600) // autre jour : ignorée
+    let d = await getDayTasks(WEEK, NOW)
+    expect(
+      d.planned.flatMap((g) => g.items.map((i) => [i.task.label, i.plannedSec, i.realSec])),
+    ).toEqual([['m. 23-30', 3600, 2700]])
+    expect(
+      d.unplanned.map((g) => [g.project.name, g.items.map((i) => [i.task.label, i.realSec])]),
+    ).toEqual([['Déchiffrage', [['Sonatine', 1200]]]])
+    await planTaskOnDay(c.id, WEEK, null)
+    d = await getDayTasks(WEEK, NOW)
+    expect(d.unplanned).toEqual([])
+    expect(
+      d.planned.flatMap((g) => g.items.map((i) => [i.task.label, i.plannedSec, i.realSec])),
+    ).toEqual([
+      ['m. 23-30', 3600, 2700],
+      ['Sonatine', null, 1200],
+    ])
+  })
+
+  it('tâche prévue non travaillée : fait null ; chrono en cours compté', async () => {
+    const { getDayTasks } = await import('./week')
+    const { a, b } = await setup()
+    await planTaskOnDay(a.id, WEEK, null)
+    const s = await startSession()
+    await startTask(s.id, b.id)
+    const d = await getDayTasks(WEEK, NOW + 10 * 60_000)
+    expect(d.planned[0].items[0].realSec).toBeNull()
+    expect(d.unplanned[0].items[0]).toMatchObject({ realSec: 600 })
+  })
+})
