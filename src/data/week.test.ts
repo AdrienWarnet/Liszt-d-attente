@@ -232,3 +232,15 @@ describe('vue Jour : fait et imprévues (lot 7)', () => {
     expect(d.unplanned[0].items[0]).toMatchObject({ realSec: 600 })
   })
 })
+
+describe('reste sur le budget (lot 9)', () => {
+  it('reste, pile, au-dessus ; null sans budget ; aucun réel = tout le budget reste', async () => {
+    const { formatRemaining } = await import('./week')
+    expect(formatRemaining(1 * H, 1.5 * H)).toBe('Reste 0:30')
+    expect(formatRemaining(1 * H, 1.5 * H, false)).toBe('reste 0:30')
+    expect(formatRemaining(null, 1.5 * H)).toBe('Reste 1:30')
+    expect(formatRemaining(1.5 * H + 30, 1.5 * H)).toBe('pile dans le budget')
+    expect(formatRemaining(2 * H, 1.5 * H)).toBe('0:30 au-dessus du budget')
+    expect(formatRemaining(1 * H, null)).toBeNull()
+  })
+})

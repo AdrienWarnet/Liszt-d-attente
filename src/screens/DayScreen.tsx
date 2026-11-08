@@ -23,6 +23,7 @@ import { useActiveTasksGrouped, useDayOverview, useDayTasks, useWeekOverview } f
 import type { Day } from '../data/types'
 import {
   formatGap,
+  formatRemaining,
   planTaskOnDay,
   setDailyBudget,
   setDayPlannedTasks,
@@ -117,8 +118,8 @@ export function DayScreen() {
   if (!valid) return <Navigate to="/semaine" replace />
 
   const plannedGap = overview && formatGap(overview.planned, overview.budget)
-  // Le réel du jour compte les tâches prévues ET imprévues.
-  const realGap = overview && formatGap(overview.real, overview.budget)
+  // Le réel du jour compte les tâches prévues ET imprévues. Lot 9 : « Reste 0:20 ».
+  const realGap = overview && formatRemaining(overview.real, overview.budget)
   const plannedIds = plan?.flatMap((g) => g.items.map((i) => i.task.id)) ?? []
 
   return (

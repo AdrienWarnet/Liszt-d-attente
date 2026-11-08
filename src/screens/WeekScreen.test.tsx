@@ -92,7 +92,9 @@ describe('Onglet Semaine', () => {
     expect(row).toHaveTextContent(labels.week.today)
     expect(row.querySelector('[data-over]')).not.toBeNull() // barre `ink`
     expect(document.querySelector('.text-over, .bg-over, .bg-over-soft')).toBeNull()
-    expect(screen.getByText(labels.week.real('0:20 au-dessus du budget'))).toBeInTheDocument()
+    // Lot 9 : Avancement et ligne du jour disent ce qui reste, ou le dépassement (constat neutre).
+    expect(screen.getByText('0:20 au-dessus du budget')).toBeInTheDocument()
+    expect(row).toHaveTextContent('Réel 1:20 · 1 tâche · 0:20 au-dessus du budget')
     expect(within(row).queryByText(/tâches/)).toBeNull()
   })
 
@@ -158,5 +160,24 @@ describe('Temps prévu par projet', () => {
     const input = await screen.findByLabelText(labels.week.plannedOf('Ballade'))
     const row = input.parentElement!
     await vi.waitFor(() => expect(row).toHaveTextContent('Réel 1:00'))
+  })
+})
+
+describe('Reste sur le budget (lot 9)', () => {
+  it('Avancement « Reste 1:30 » et ligne du jour « reste 0:30 »', async () => {
+    const p = await createProject({ name: 'Ballade' })
+    const s = await createSection(p.id, 'Page 1')
+    const t = await createTask(s.id, 'Lignes')
+    await db.dailyBudgets.put({ day: '2026-11-09', durationSec: 3600 })
+    await db.dailyBudgets.put({ day: '2026-11-10', durationSec: 3600 })
+    await addManualEntry(t.id, '2026-11-09', 1800)
+    renderApp('/semaine')
+    expect(await screen.findByText('Reste 1:30')).toBeInTheDocument()
+    const row = await screen.findByRole('button', { name: labels.week.dayDetail('lun. 9 nov.') })
+    await vi.waitFor(() => expect(row).toHaveTextContent('Réel 0:30 · reste 0:30'))
+    const tuesday = screen.getByRole('button', { name: labels.week.dayDetail('mar. 10 nov.') })
+    expect(tuesday).toHaveTextContent('Réel — · reste 1:00')
+    const wednesday = screen.getByRole('button', { name: labels.week.dayDetail('mer. 11 nov.') })
+    expect(wednesday).not.toHaveTextContent('reste')
   })
 })

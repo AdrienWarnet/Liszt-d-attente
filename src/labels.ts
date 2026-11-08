@@ -132,6 +132,7 @@ export const labels = {
   gap: {
     budget: { above: 'au-dessus du budget', below: 'sous le budget', even: 'pile dans le budget' },
     planned: { above: 'au-dessus du prévu', below: 'sous le prévu', even: 'pile dans le prévu' },
+    remaining: (rest: string, capitalized = true) => `${capitalized ? 'Reste' : 'reste'} ${rest}`,
   },
 
   duration: {

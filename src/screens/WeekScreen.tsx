@@ -8,13 +8,12 @@ import { WeekNav } from '../components/WeekNav'
 import { addWeeks, formatDayLabel, formatDayShort, today, weekStart } from '../data/dates'
 import { formatDuration } from '../data/durations'
 import { useWeekOverview } from '../data/hooks'
-import { formatGap, setDailyBudget, type WeekOverview } from '../data/week'
+import { formatRemaining, setDailyBudget, type WeekOverview } from '../data/week'
 import type { WeekStart } from '../data/types'
 import { labels } from '../labels'
 import { PlannedByProject } from './week/PlannedByProject'
 
 function ProgressPanel({ week }: { week: WeekOverview['week'] }) {
-  const gap = formatGap(week.real, week.budget)
   return (
     <div className={ui.panel}>
       <div className="flex items-center justify-between gap-3">
@@ -27,7 +26,7 @@ function ProgressPanel({ week }: { week: WeekOverview['week'] }) {
         <Bar value={week.real} reference={week.budget} />
       </div>
       <p className={`${ui.fact} mt-1.5`}>
-        {week.budget === null ? labels.week.enterBudget : gap && labels.week.real(gap)}
+        {week.budget === null ? labels.week.enterBudget : formatRemaining(week.real, week.budget)}
       </p>
     </div>
   )
@@ -56,7 +55,12 @@ function DailyBudgets({ overview, ws }: { overview: WeekOverview; ws: WeekStart 
                   {d.isToday && <span className="text-xs text-felt"> · {labels.week.today}</span>}
                 </span>
                 <small className="font-medium text-muted tabular-nums">
-                  {labels.week.dayLine(formatDuration(d.real), d.plannedTaskCount)}
+                  {[
+                    labels.week.dayLine(formatDuration(d.real), d.plannedTaskCount),
+                    formatRemaining(d.real, d.budget, false),
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
                 </small>
               </span>
               <span className="w-full">
