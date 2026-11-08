@@ -287,3 +287,22 @@ export async function getDayTasks(day: Day, now: Timestamp): Promise<DayTasks> {
     .sort(byPosition)
   return { planned: groupByProject(planned), unplanned: groupByProject(unplanned) }
 }
+
+// ---------- Reste sur le budget (lot 9) ----------
+
+/**
+ * Ce qui reste du budget après le réel : « Reste 0:40 » ; au-delà, constat neutre
+ * « 0:20 au-dessus du budget » ; à moins d'une minute, « pile dans le budget ».
+ * `null` si le budget n'est pas saisi.
+ */
+export function formatRemaining(
+  real: DurationSec | null,
+  budget: DurationSec | null,
+  capitalized = true,
+): string | null {
+  if (budget === null) return null
+  const rest = budget - (real ?? 0)
+  if (Math.abs(rest) < GAP_THRESHOLD_SEC) return labels.gap.budget.even
+  if (rest > 0) return labels.gap.remaining(formatDuration(rest), capitalized)
+  return `${formatDuration(-rest)} ${labels.gap.budget.above}`
+}

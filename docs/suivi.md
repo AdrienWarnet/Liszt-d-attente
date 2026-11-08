@@ -89,7 +89,7 @@ Ordre conseillé (révisé le 07/11/2026) : epic 1, puis 2.1 → lot 1 → 2.2 �
 | Lot 6 | `lot-6-session-ajout-seul-et-prevu-par-tache` | Retours d'Adele (08/11/2026) : la feuille « Ajouter des tâches » ne fait plus qu'ajouter (tâches déjà dans la session cochées et grisées) ; ✕ pour retirer une tâche de la session tant qu'elle est à 0:00:00 ; sous chaque tâche de la session, temps prévu du jour et reste (« prévu 1:00 · reste 0:15 »). | CC | À vérifier | — |
 | Lot 7 | `lot-7-vue-jour-fait-et-imprevues` | Retours d'Adele : vue Jour — temps fait sur chaque tâche prévue ; bloc « Imprévues » (tâches travaillées ce jour sans être prévues, statut recalculé) avec raccourci « Ajouter au prévu » (sans durée). | CC | À vérifier | — |
 | Lot 8 | `lot-8-total-prevu-fait-budget` | Retours d'Adele : vue Jour, total « Prévu · Fait · Budget » avec écarts (rouge seulement pour le prévu > budget). Lot séparé, annulable seul. | CC | À vérifier | — |
-| Lot 9 | `lot-9-reste-sur-le-budget` | Retours d'Adele : « Reste 0:40 » (budget − réel) sur le jour (vue Jour, lignes de l'onglet Semaine) et la semaine (Avancement) ; au-delà : constat « au-dessus du budget ». Lot séparé, annulable seul. | CC | À faire | — |
+| Lot 9 | `lot-9-reste-sur-le-budget` | Retours d'Adele : « Reste 0:40 » (budget − réel) sur le jour (vue Jour, lignes de l'onglet Semaine) et la semaine (Avancement) ; au-delà : constat « au-dessus du budget ». Lot séparé, annulable seul. | CC | À vérifier | — |
 | — | — | Idée d'Adele, plus tard : vue calendrier de la semaine sur l'onglet Semaine. | — | À planifier | — |
 
 ## Hypothèses à vérifier
