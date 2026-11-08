@@ -203,6 +203,11 @@ export const labels = {
     endText: (total: string) => `Durée totale ${total}. Le chrono en cours sera arrêté.`,
     endConfirm: 'Terminer',
     saved: 'Session enregistrée',
+    alreadyIn: 'déjà dans la session',
+    planned: (planned: string) => `prévu ${planned}`,
+    remaining: (rest: string) => `reste ${rest}`,
+    overPlanned: (over: string) => `${over} au-dessus du prévu`,
+    removeTask: (task: string) => `Retirer ${task} de la session`,
   },
 
   banner: {

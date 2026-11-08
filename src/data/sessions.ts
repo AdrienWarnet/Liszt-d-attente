@@ -348,6 +348,10 @@ export interface SessionTaskLine extends TaskContext {
   /** Durée dans la session (0 si jamais lancée). */
   durationSec: DurationSec
   corrected: boolean
+  /** Du temps est enregistré (segment ou correction) : la tâche ne peut plus être retirée. */
+  hasTime: boolean
+  /** Temps prévu ce jour-là (jour de la session), `null` si non prévu ou sans durée. */
+  plannedSec: DurationSec | null
   running: boolean
 }
 
@@ -357,6 +361,7 @@ async function sessionLines(session: Session, now: Timestamp): Promise<SessionTa
   )
   const segments = await db.timeSegments.filter((s) => s.sessionId === session.id).toArray()
   const contexts = await taskContexts(sts.map((st) => st.taskId))
+  const plans = await db.taskDayPlans.where('day').equals(session.day).toArray()
   return sts
     .filter((st) => contexts.has(st.taskId))
     .map((st) => {
@@ -366,6 +371,8 @@ async function sessionLines(session: Session, now: Timestamp): Promise<SessionTa
         durationSec: taskDuration(st, own, now) ?? 0,
         corrected: st.correctedDurationSec !== null,
         running: own.some((s) => s.endedAt === null),
+        hasTime: own.length > 0 || st.correctedDurationSec !== null,
+        plannedSec: plans.find((p) => p.taskId === st.taskId)?.durationSec ?? null,
       }
     })
 }
@@ -565,4 +572,31 @@ export async function listRealEntriesForTasks(
     .toArray()
   for (const m of manual) entries.push({ taskId: m.taskId, day: m.day, durationSec: m.durationSec })
   return entries
+}
+
+// ---------- Session : ajout seul et retrait sans temps (lot 6) ----------
+
+/** Ajoute des tâches à la session (jamais de retrait). */
+export async function addTasksToSession(sessionId: string, taskIds: readonly string[]) {
+  await db.transaction('rw', db.sessions, db.sessionTasks, db.tasks, async () => {
+    await getOpenSession(sessionId)
+    for (const taskId of taskIds) await addSessionTask(sessionId, taskId)
+  })
+}
+
+/** Retire une tâche de la session tant qu'aucun temps n'y est enregistré (sinon `hasTime`). */
+export async function removeTaskFromSession(sessionId: string, taskId: string) {
+  await db.transaction('rw', db.sessionTasks, db.timeSegments, async () => {
+    const st = await db.sessionTasks.get([sessionId, taskId])
+    if (!st) throw new ValidationError('notFound')
+    const segments = await segmentsOf(sessionId, taskId)
+    if (segments.length > 0 || st.correctedDurationSec !== null)
+      throw new ValidationError('hasTime')
+    await db.sessionTasks.delete([sessionId, taskId])
+  })
+}
+
+/** Reste du temps prévu d'une tâche dans la session : prévu − fait (négatif = au-dessus). */
+export function plannedRemaining(line: Pick<SessionTaskLine, 'plannedSec' | 'durationSec'>) {
+  return line.plannedSec === null ? null : line.plannedSec - line.durationSec
 }

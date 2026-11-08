@@ -116,7 +116,10 @@ describe('Démarrer une session (4.2)', () => {
     await vi.waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
     await userEvent.click(await screen.findByRole('button', { name: labels.session.addTasks }))
     await screen.findByRole('dialog', { name: labels.session.addTasksTitle })
-    expect(await within(sheet()).findByRole('checkbox', { name: 'm. 23-30' })).toBeChecked()
+    const box = await within(sheet()).findByRole('checkbox', { name: /m\. 23-30/ })
+    expect(box).toBeChecked()
+    expect(box).toBeDisabled() // lot 6 : la feuille ne fait qu'ajouter
+    expect(within(sheet()).getByText(labels.session.alreadyIn)).toBeInTheDocument()
   })
 })
 
@@ -190,5 +193,47 @@ describe('Session en cours (4.3)', () => {
     ).toBeInTheDocument()
     expect((await db.timeSegments.toArray()).every((s) => s.endedAt !== null)).toBe(true)
     expect((await db.sessions.toArray())[0].endedAt).not.toBeNull()
+  })
+})
+
+describe('Session : ajout seul, retrait à 0:00:00, prévu par tâche (lot 6)', () => {
+  it('✕ retire une tâche jamais lancée ; pas de ✕ dès qu’elle a du temps', async () => {
+    const { a, b } = await setup()
+    const { startSession, setSessionTasks } = await import('../data/sessions')
+    const s = await startSession()
+    await setSessionTasks(s.id, [a.id, b.id])
+    renderApp('/')
+    await userEvent.click(
+      await screen.findByRole('button', { name: labels.session.play('m. 23-30') }),
+    )
+    await screen.findByRole('button', { name: labels.session.pause('m. 23-30') })
+    expect(screen.queryByRole('button', { name: labels.session.removeTask('m. 23-30') })).toBeNull()
+    await userEvent.click(
+      screen.getByRole('button', { name: labels.session.removeTask('m. 45-52') }),
+    )
+    await vi.waitFor(() => expect(screen.queryByText('m. 45-52')).toBeNull())
+    expect((await db.sessionTasks.toArray()).map((x) => x.taskId)).toEqual([a.id])
+  })
+
+  it('affiche le temps prévu du jour et le reste sous la tâche', async () => {
+    const { a, b } = await setup()
+    await db.taskDayPlans.put({ taskId: a.id, day: '2026-11-09', durationSec: 3600 })
+    const { startSession, setSessionTasks, startTask } = await import('../data/sessions')
+    const s = await startSession()
+    await setSessionTasks(s.id, [a.id, b.id])
+    await startTask(s.id, a.id)
+    vi.setSystemTime(Date.UTC(2026, 10, 9, 17, 42 + 45))
+    renderApp('/')
+    const line = await screen.findByTestId('planned-line')
+    await vi.waitFor(() => expect(line).toHaveTextContent('prévu 1:00 · reste 0:15'))
+    expect(screen.getAllByTestId('planned-line')).toHaveLength(1) // m. 45-52 n'a pas de prévu
+    vi.setSystemTime(Date.UTC(2026, 10, 9, 17, 42 + 70))
+    await vi.waitFor(
+      () =>
+        expect(screen.getByTestId('planned-line')).toHaveTextContent(
+          'prévu 1:00 · 0:10 au-dessus du prévu',
+        ),
+      { timeout: 3000 },
+    )
   })
 })

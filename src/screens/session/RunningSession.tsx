@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { PauseIcon, PlayIcon } from '../../components/icons'
+import { CloseIcon, PauseIcon, PlayIcon } from '../../components/icons'
 import { ProjectGroupHeader } from '../../components/ProjectGroupHeader'
 import { Sheet } from '../../components/Sheet'
 import { useToast } from '../../components/Toast'
@@ -8,9 +8,27 @@ import { useNow } from '../../components/useNow'
 import { formatTimeOfDay } from '../../data/dates'
 import { formatClock, formatDuration } from '../../data/durations'
 import { useSessionView } from '../../data/hooks'
-import { endSession, pauseTask, startTask } from '../../data/sessions'
+import {
+  endSession,
+  pauseTask,
+  plannedRemaining,
+  removeTaskFromSession,
+  startTask,
+  type SessionTaskLine,
+} from '../../data/sessions'
 import type { Session } from '../../data/types'
 import { labels } from '../../labels'
+
+/** « prévu 1:00 · reste 0:15 », ou « prévu 1:00 · 0:05 au-dessus du prévu » (constat). */
+function plannedLine(line: SessionTaskLine) {
+  const rest = plannedRemaining(line)!
+  const planned = labels.session.planned(formatDuration(line.plannedSec))
+  const tail =
+    rest >= 0
+      ? labels.session.remaining(formatDuration(rest))
+      : labels.session.overPlanned(formatDuration(-rest))
+  return `${planned} · ${tail}`
+}
 
 interface Props {
   session: Session
@@ -52,41 +70,59 @@ export function RunningSession({ session, onAddTasks }: Props) {
       {view.groups.map((group) => (
         <div key={group.project.id}>
           <ProjectGroupHeader project={group.project} color={group.color} />
-          {group.items.map(({ task, section, durationSec, running }) => (
-            <div
-              key={task.id}
-              data-running={running || undefined}
-              className="relative flex items-center gap-3 border-b border-line py-3.5"
-            >
-              {running && (
+          {group.items.map((line) => {
+            const { task, section, durationSec, running } = line
+            return (
+              <div
+                key={task.id}
+                data-running={running || undefined}
+                className="relative flex items-center gap-3 border-b border-line py-3.5"
+              >
+                {running && (
+                  <span
+                    className="absolute inset-y-3 -left-5 w-[3px] rounded-r-[3px] bg-felt"
+                    aria-hidden="true"
+                  />
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className={ui.crumb}>{section.name}</div>
+                  <div className="mt-0.5 font-semibold">{task.label}</div>
+                  {line.plannedSec !== null && (
+                    <div className="text-xs text-muted tabular-nums" data-testid="planned-line">
+                      {plannedLine(line)}
+                    </div>
+                  )}
+                </div>
                 <span
-                  className="absolute inset-y-3 -left-5 w-[3px] rounded-r-[3px] bg-felt"
-                  aria-hidden="true"
-                />
-              )}
-              <div className="min-w-0 flex-1">
-                <div className={ui.crumb}>{section.name}</div>
-                <div className="mt-0.5 font-semibold">{task.label}</div>
+                  className={`font-semibold tabular-nums ${running ? 'text-felt' : 'text-muted'}`}
+                >
+                  {formatClock(durationSec)}
+                </span>
+                <button
+                  type="button"
+                  aria-label={
+                    running ? labels.session.pause(task.label) : labels.session.play(task.label)
+                  }
+                  onClick={() => (running ? pauseTask() : startTask(session.id, task.id))}
+                  className={`grid size-14 shrink-0 place-items-center rounded-full border-[1.5px] ${
+                    running ? 'border-felt bg-felt text-screen' : 'border-line'
+                  }`}
+                >
+                  {running ? <PauseIcon /> : <PlayIcon />}
+                </button>
+                {!line.hasTime && (
+                  <button
+                    type="button"
+                    className={ui.iconButton}
+                    aria-label={labels.session.removeTask(task.label)}
+                    onClick={() => removeTaskFromSession(session.id, task.id)}
+                  >
+                    <CloseIcon />
+                  </button>
+                )}
               </div>
-              <span
-                className={`font-semibold tabular-nums ${running ? 'text-felt' : 'text-muted'}`}
-              >
-                {formatClock(durationSec)}
-              </span>
-              <button
-                type="button"
-                aria-label={
-                  running ? labels.session.pause(task.label) : labels.session.play(task.label)
-                }
-                onClick={() => (running ? pauseTask() : startTask(session.id, task.id))}
-                className={`grid size-14 shrink-0 place-items-center rounded-full border-[1.5px] ${
-                  running ? 'border-felt bg-felt text-screen' : 'border-line'
-                }`}
-              >
-                {running ? <PauseIcon /> : <PlayIcon />}
-              </button>
-            </div>
-          ))}
+            )
+          })}
         </div>
       ))}
 
