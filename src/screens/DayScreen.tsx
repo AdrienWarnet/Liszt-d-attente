@@ -116,7 +116,9 @@ export function DayScreen() {
 
   if (!valid) return <Navigate to="/semaine" replace />
 
-  const gap = overview && formatGap(overview.planned, overview.budget)
+  const plannedGap = overview && formatGap(overview.planned, overview.budget)
+  // Le réel du jour compte les tâches prévues ET imprévues.
+  const realGap = overview && formatGap(overview.real, overview.budget)
   const plannedIds = plan?.flatMap((g) => g.items.map((i) => i.task.id)) ?? []
 
   return (
@@ -133,9 +135,27 @@ export function DayScreen() {
               onCommit={(v) => setDailyBudget(day, v)}
             />
           </div>
-          <div className="flex items-center justify-between gap-3 py-1.5">
+          {/* Lot 8 : total du jour « Prévu · Réel · Budget » avec écarts.
+              Rouge seulement pour le prévu au-dessus du budget (R12). */}
+          <div className="flex items-center justify-between gap-3 py-1.5" data-testid="day-planned">
+            <span>{labels.day.plannedTotal}</span>
+            <span className="text-right">
+              <span className="font-semibold tabular-nums">{formatDuration(overview.planned)}</span>
+              {plannedGap && (
+                <small
+                  className={`block text-xs ${overview.plannedOverBudget ? 'font-bold text-over' : 'text-muted'}`}
+                >
+                  {overview.plannedOverBudget ? `▲ ${plannedGap}` : plannedGap}
+                </small>
+              )}
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-3 py-1.5" data-testid="day-real">
             <span>{labels.day.real}</span>
-            <span className="font-semibold tabular-nums">{formatDuration(overview.real)}</span>
+            <span className="text-right">
+              <span className="font-semibold tabular-nums">{formatDuration(overview.real)}</span>
+              {realGap && <small className="block text-xs text-muted">{realGap}</small>}
+            </span>
           </div>
           <div className="pb-1.5">
             <Bar value={overview.real} reference={overview.budget} />
@@ -216,21 +236,6 @@ export function DayScreen() {
             </div>
           ))}
         </section>
-      )}
-
-      {overview && (overview.planned !== null || gap) && (
-        <p className={ui.fact} data-testid="day-facts">
-          {[overview.planned !== null && labels.day.planned(formatDuration(overview.planned))]
-            .filter(Boolean)
-            .join('')}
-          {overview.planned !== null && gap && ' · '}
-          {gap &&
-            (overview.plannedOverBudget ? (
-              <span className="font-bold text-over">▲ {gap}</span>
-            ) : (
-              gap
-            ))}
-        </p>
       )}
 
       {planning && <PlanSheet day={day} planned={plannedIds} onClose={() => setPlanning(false)} />}

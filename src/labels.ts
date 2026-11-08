@@ -177,6 +177,7 @@ export const labels = {
     keyLabel: (day: string) => `Voir le ${day}`,
     done: (duration: string) => `fait ${duration}`,
     unplanned: 'Imprévues',
+    plannedTotal: 'Prévu',
     unplannedHint: 'Travaillées ce jour sans être prévues.',
     addToPlan: 'Ajouter au prévu',
     addToPlanLabel: (task: string) => `Ajouter ${task} au prévu`,
