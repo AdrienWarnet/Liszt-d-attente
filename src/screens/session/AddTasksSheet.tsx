@@ -6,7 +6,7 @@ import { ui } from '../../components/ui'
 import { today } from '../../data/dates'
 import { useActiveTasksGrouped, useDayPlan, useSessionView } from '../../data/hooks'
 import type { ActiveTasksGroup } from '../../data/projects'
-import { createTaskInSession, setSessionTasks } from '../../data/sessions'
+import { addTasksToSession, createTaskInSession } from '../../data/sessions'
 import type { PlannedTask } from '../../data/week'
 import { labels } from '../../labels'
 
@@ -42,7 +42,10 @@ function SheetContent({
   planned,
   initial,
 }: Props & { groups: ActiveTasksGroup[]; planned: PlannedTask[]; initial: string[] }) {
-  const [checked, setChecked] = useState(() => new Set(initial))
+  // Lot 6 : la feuille ne fait qu'ajouter. Les tâches déjà dans la session sont cochées et
+  // grisées ; on les retire depuis la session (✕, tant qu'elles sont à 0:00:00).
+  const [inSession] = useState(() => new Set(initial))
+  const [checked, setChecked] = useState(() => new Set<string>())
   const [sectionId, setSectionId] = useState('')
   const [label, setLabel] = useState('')
   const toast = useToast()
@@ -61,7 +64,7 @@ function SheetContent({
       toast(labels.session.chooseSection)
       return
     }
-    await setSessionTasks(sessionId, [...checked])
+    await addTasksToSession(sessionId, [...checked])
     if (label.trim() !== '') await createTaskInSession(sessionId, sectionId, label)
     onClose()
   }
@@ -74,12 +77,16 @@ function SheetContent({
       <input
         type="checkbox"
         className="size-[22px] shrink-0 accent-felt"
-        checked={checked.has(id)}
+        checked={inSession.has(id) || checked.has(id)}
+        disabled={inSession.has(id)}
         onChange={() => toggle(id)}
       />
       <span className="min-w-0 flex-1">
         {text}
         {crumb && <span className={`${ui.crumb} block`}>{crumb}</span>}
+        {inSession.has(id) && (
+          <span className="block text-xs text-muted">{labels.session.alreadyIn}</span>
+        )}
       </span>
     </label>
   )
@@ -100,7 +107,14 @@ function SheetContent({
           )}
         </div>
       )}
-      <TaskChecklist groups={groups} checked={checked} onToggle={toggle} exclude={plannedIds} />
+      <TaskChecklist
+        groups={groups}
+        checked={checked}
+        onToggle={toggle}
+        exclude={plannedIds}
+        locked={inSession}
+        lockedHint={labels.session.alreadyIn}
+      />
 
       <div className="mt-4 mb-1 text-sm font-bold">{labels.session.createTask}</div>
       <select

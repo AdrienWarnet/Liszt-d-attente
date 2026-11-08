@@ -311,3 +311,51 @@ describe('ajouts manuels récents', () => {
     ])
   })
 })
+
+describe('lot 6 : ajout seul, retrait sans temps, prévu par tâche', () => {
+  it('addTasksToSession ajoute sans jamais retirer', async () => {
+    const { addTasksToSession } = await import('./sessions')
+    const { a, b } = await setup()
+    const s = await startSession()
+    await addTasksToSession(s.id, [a.id])
+    await addTasksToSession(s.id, [b.id])
+    expect((await db.sessionTasks.toArray()).map((x) => x.taskId).sort()).toEqual(
+      [a.id, b.id].sort(),
+    )
+  })
+
+  it('retrait possible à 0 s, refusé dès qu’un chrono ou une correction existe', async () => {
+    const { removeTaskFromSession } = await import('./sessions')
+    const { a, b, c } = await setup()
+    const s = await startSession()
+    await setSessionTasks(s.id, [a.id, b.id, c.id])
+    await removeTaskFromSession(s.id, a.id)
+    await startTask(s.id, b.id)
+    await pauseTask()
+    await expectCode(removeTaskFromSession(s.id, b.id), 'hasTime')
+    await correctSessionTaskDuration(s.id, c.id, 0)
+    await expectCode(removeTaskFromSession(s.id, c.id), 'hasTime')
+    expect((await db.sessionTasks.toArray()).map((x) => x.taskId).sort()).toEqual(
+      [b.id, c.id].sort(),
+    )
+  })
+
+  it('vue de session : temps prévu du jour de la session et reste', async () => {
+    const { plannedRemaining } = await import('./sessions')
+    const { planTaskOnDay } = await import('./week')
+    const { a, b } = await setup()
+    await planTaskOnDay(a.id, '2026-11-09', 3600)
+    await planTaskOnDay(b.id, '2026-11-10', 1800) // un autre jour : ignoré
+    const s = await startSession()
+    await setSessionTasks(s.id, [a.id, b.id])
+    await startTask(s.id, a.id)
+    at(paris(9, 18, 45))
+    const lines = (await getSessionView(s.id))!.groups[0].items
+    expect(lines.map((l) => [l.task.label, l.plannedSec, l.hasTime])).toEqual([
+      ['m. 23-30', 3600, true],
+      ['m. 45-52', null, false],
+    ])
+    expect(plannedRemaining(lines[0])).toBe(15 * 60)
+    expect(plannedRemaining(lines[1])).toBeNull()
+  })
+})

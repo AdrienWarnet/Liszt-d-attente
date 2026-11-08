@@ -6,10 +6,20 @@ interface TaskChecklistProps {
   onToggle: (taskId: string) => void
   /** Tâches déjà proposées ailleurs dans la feuille (ex. « Prévu aujourd'hui »). */
   exclude?: ReadonlySet<string>
+  /** Tâches cochées d'office et non décochables (ex. déjà dans la session), avec une mention. */
+  locked?: ReadonlySet<string>
+  lockedHint?: string
 }
 
 /** Tâches actives groupées projet → section, cases à cocher (feuilles du proto). */
-export function TaskChecklist({ groups, checked, onToggle, exclude }: TaskChecklistProps) {
+export function TaskChecklist({
+  groups,
+  checked,
+  onToggle,
+  exclude,
+  locked,
+  lockedHint,
+}: TaskChecklistProps) {
   return (
     <>
       {groups.map(({ project, sections }) => (
@@ -35,10 +45,16 @@ export function TaskChecklist({ groups, checked, onToggle, exclude }: TaskCheckl
                     <input
                       type="checkbox"
                       className="size-[22px] shrink-0 accent-felt"
-                      checked={checked.has(task.id)}
+                      checked={locked?.has(task.id) || checked.has(task.id)}
+                      disabled={locked?.has(task.id)}
                       onChange={() => onToggle(task.id)}
                     />
-                    <span className="min-w-0 flex-1">{task.label}</span>
+                    <span className="min-w-0 flex-1">
+                      {task.label}
+                      {locked?.has(task.id) && lockedHint && (
+                        <span className="block text-xs text-muted">{lockedHint}</span>
+                      )}
+                    </span>
                   </label>
                 ))}
               </div>
